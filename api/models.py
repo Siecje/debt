@@ -53,7 +53,7 @@ class Expense(Common):
 class CreditCard(Common):
     name = models.TextField()
     interest_rate = models.FloatField()
-    owed = models.IntegerField()
+    balance = models.IntegerField()
     min_payment = models.IntegerField()
     min_payment_percent = models.FloatField()
     annual_fee = models.IntegerField()
@@ -69,7 +69,7 @@ class CreditCard(Common):
 
 class Overdraft(Common):
     name = models.TextField()
-    owed = models.IntegerField()
+    balance = models.IntegerField()
     monthly_fee = models.IntegerField()
 
     user = models.ForeignKey(User, related_name='overdrafts')

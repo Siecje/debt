@@ -69,7 +69,7 @@ class CreditCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CreditCard
-        fields = ('id', 'name', 'interest_rate', 'owed', 'min_payment',
+        fields = ('id', 'name', 'interest_rate', 'balance', 'min_payment',
                   'min_payment_percent', 'annual_fee', 'user')
 
 
@@ -80,7 +80,7 @@ class OverdraftSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Overdraft
-        fields = ('id', 'name', 'owed', 'monthly_fee', 'user')
+        fields = ('id', 'name', 'balance', 'monthly_fee', 'user')
 
 
 class UserSerializer(serializers.ModelSerializer):
