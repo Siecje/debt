@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import permissions, viewsets
+from rest_framework import filters, permissions, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -21,42 +21,66 @@ def api_root(request, format=None):
     })
 
 
+class IsOwnerFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter that only allows users to see their own objects.
+    """
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter(user=request.user)
+
+
 class CreditCardViewSet(viewsets.ModelViewSet):
     queryset = CreditCard.objects.all()
     serializer_class = CreditCardSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
 
 
 class IncomeViewSet(viewsets.ModelViewSet):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
 
 
 class OverdraftViewSet(viewsets.ModelViewSet):
     queryset = Overdraft.objects.all()
     serializer_class = OverdraftSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
 
 
 class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
+
+
+class IsOwner(permissions.BasePermission):
+    """
+    Object-level permission to only allow owners of an object to access it.
+    Assumes the model instance has an `user` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Instance must have an attribute named `user`.
+        return obj == request.user
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsOwner,)

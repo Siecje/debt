@@ -112,7 +112,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^users/?$',
         user_list,
         name='user-list'),
-    url(r'^users/(?P<id>[0-9]+)/?$',
+    url(r'^users/(?P<pk>[0-9]+)/?$',
         user_detail,
         name='user-detail')
 ])
