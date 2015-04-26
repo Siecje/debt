@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import filters, permissions, serializers, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Overdraft, Type
@@ -69,18 +69,39 @@ class TypeViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
 
 
-class IsOwner(permissions.BasePermission):
+class IsAdminOrOwner(permissions.BasePermission):
     """
-    Object-level permission to only allow owners of an object to access it.
+    Object-level permission to allow admins or the user of an object to access it.
     Assumes the model instance has an `user` attribute.
     """
 
     def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
         # Instance must have an attribute named `user`.
         return obj == request.user
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    # queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsOwner,)
+    permission_classes = (IsAdminOrOwner,)
+
+    @list_route(methods=['post'])
+    def create_user(self, request):
+        serialized = UserSerializer(data=request.DATA)
+        if serialized.is_valid():
+            User.objects.create_user(
+                email=serialized.init_data['email'],
+                username=serialized.init_data['username'],
+                password=serialized.init_data['password']
+            )
+            return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_queryset(self):
+        if self.request.user.is_anonymous():
+            return User.objects.none()
+        elif self.request.user.is_superuser:
+            return User.objects.all()
+        return User.objects.filter(pk=self.request.user.pk)

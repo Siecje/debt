@@ -118,7 +118,7 @@ urlpatterns = format_suffix_patterns([
 ])
 
 urlpatterns += [
-    url(r'^auth/token/?$', auth_views.obtain_auth_token),
+    url(r'^auth/token/?$', auth_views.obtain_auth_token, name='auth-token'),
     url(r'^auth/', include('rest_framework.urls',
                            namespace='rest_framework')),
 ]
