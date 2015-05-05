@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import filters, permissions, serializers, viewsets
 from rest_framework.decorators import api_view, list_route
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Overdraft, Type
@@ -17,7 +18,7 @@ def api_root(request, format=None):
         'incomes': reverse('income-list', request=request, format=format),
         'overdrafts': reverse('overdraft-list', request=request, format=format),
         'types': reverse('type-list', request=request, format=format),
-        # 'auth-token': reverse('rest_framework.authtoken.views.obtain_auth_token', request=request, format=format)
+        'auth-token': reverse('auth-token', request=request, format=format)
     })
 
 
@@ -105,3 +106,13 @@ class UserViewSet(viewsets.ModelViewSet):
         elif self.request.user.is_superuser:
             return User.objects.all()
         return User.objects.filter(pk=self.request.user.pk)
+
+
+@api_view(['GET'])
+def get_debts(request):
+    overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
+    credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
+    print credit_cards
+    # return Response(JSONRenderer().render([CreditCardSerializer(credit_cards).data]))
+    # return Response(credit_cards)
+    return Response(CreditCardSerializer(credit_cards).data)
