@@ -112,7 +112,5 @@ class UserViewSet(viewsets.ModelViewSet):
 def get_debts(request):
     overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
     credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
-    print credit_cards
-    # return Response(JSONRenderer().render([CreditCardSerializer(credit_cards).data]))
-    # return Response(credit_cards)
-    return Response(CreditCardSerializer(credit_cards).data)
+    serialized = OverdraftSerializer(overdrafts, many=True).data + CreditCardSerializer(credit_cards, many=True).data
+    return Response(serialized)
