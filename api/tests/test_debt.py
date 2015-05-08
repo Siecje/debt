@@ -22,13 +22,13 @@ class DebtTests(APITestCase):
                                  balance='1000', min_payment='100',
                                  min_payment_percent='15', annual_fee='100',
                                  user=user_one)
-        print JSONRenderer().render([CreditCardSerializer(credit_card).data])
+
         credit_card.save()
         token = Token.objects.get(user__username=user_one.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
         url = reverse('get-debts')
         response = self.client.get(url)
-        # self.assertEqual(response.status_code, 200)
-        # self.assertJSONEqual(json.dumps(json.loads(response.content)),
-        #     JSONRenderer().render([CreditCardSerializer(credit_card).data]))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+            JSONRenderer().render([CreditCardSerializer(credit_card).data]))
