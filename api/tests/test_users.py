@@ -38,10 +38,11 @@ class UserTests(APITestCase):
             'username': 'Unique',
             'email': 'unique@example.com',
             'password': 'unique'
-            }
+        }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'username': data['username']})
+        user = User.objects.get(username='Unique')
+        self.assertEqual(response.data, UserSerializer(user).data)
 
     def test_admin_can_view_all_user_list(self):
         """
@@ -116,3 +117,16 @@ class UserTests(APITestCase):
         url = reverse('user-detail', kwargs={'pk': self.user_two.pk})
         response = client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_new_user_is_not_active(self):
+        client = APIClient()
+        url = reverse('user-list')
+        data = {
+            'username': 'NotActive',
+            'email': 'not.active@example.com',
+            'password': 'notActive'
+        }
+        response = client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        user = User.objects.get(username='NotActive')
+        self.assertEqual(user.is_active, False)

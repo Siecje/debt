@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import filters, permissions, serializers, viewsets
+from rest_framework import filters, permissions, serializers, status, viewsets
 from rest_framework.decorators import api_view, list_route
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Overdraft, Type
 from .serializers import CreditCardSerializer, ExpenseSerializer, \
                          IncomeSerializer, OverdraftSerializer, \
-                         TypeSerializer, UserSerializer
+                         TypeSerializer, UserSerializer, CreateUserSerializer
 
 
 @api_view(('GET',))
@@ -84,20 +84,24 @@ class IsAdminOrOwner(permissions.BasePermission):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    # queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminOrOwner,)
 
-    @list_route(methods=['post'])
+    @list_route(methods=['POST'])
     def create_user(self, request):
-        serialized = UserSerializer(data=request.DATA)
+        serialized = CreateUserSerializer(data=request.DATA)
         if serialized.is_valid():
-            User.objects.create_user(
-                email=serialized.init_data['email'],
-                username=serialized.init_data['username'],
-                password=serialized.init_data['password']
+            user = User(
+                email=serialized.data.get('email'),
+                username=serialized.data.get('username'),
+                # Will be true after email verification
+                is_active=False
             )
-            return Response(serialized.data, status=status.HTTP_201_CREATED)
+            user.set_password(serialized.data.get('password'))
+            user.save()
+
+            return Response(UserSerializer(user).data,
+                            status=status.HTTP_201_CREATED)
         return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):

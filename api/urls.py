@@ -67,7 +67,7 @@ type_detail = views.TypeViewSet.as_view({
 
 user_list = views.UserViewSet.as_view({
     'get': 'list',
-    'post': 'create'
+    'post': 'create_user'
 })
 
 user_detail = views.UserViewSet.as_view({
