@@ -97,6 +97,10 @@ class UserViewSet(viewsets.ModelViewSet):
                 username=serialized.init_data['username'],
                 password=serialized.init_data['password']
             )
+            # Will be true after email verification
+            user.is_active = False
+            user.save()
+
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
 
