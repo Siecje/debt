@@ -71,7 +71,8 @@ class Overdraft(Common):
     name = models.TextField()
     balance = models.IntegerField()
     monthly_fee = models.IntegerField()
-
+    interest_rate = models.FloatField()
+    
     user = models.ForeignKey(User, related_name='overdrafts')
 
     def __str__(self):

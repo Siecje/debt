@@ -92,11 +92,14 @@ class UserViewSet(viewsets.ModelViewSet):
     def create_user(self, request):
         serialized = UserSerializer(data=request.DATA)
         if serialized.is_valid():
-            User.objects.create_user(
+            user = User.objects.create_user(
                 email=serialized.init_data['email'],
                 username=serialized.init_data['username'],
                 password=serialized.init_data['password']
             )
+            # Will be true after email verification
+            user.is_active = False
+            user.save()
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -110,6 +113,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def get_debts(request):
+    # Assuming that you are making your minimum payments for all Credit Cards
+    # TODO: should be based off your available income after expenses
+    # TODO: should calculate additional 'interest rate' of overdraft based on monthly payment
     overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
     credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
     serialized = OverdraftSerializer(overdrafts, many=True).data + CreditCardSerializer(credit_cards, many=True).data

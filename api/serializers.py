@@ -80,7 +80,7 @@ class OverdraftSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Overdraft
-        fields = ('id', 'name', 'balance', 'monthly_fee', 'user')
+        fields = ('id', 'name', 'balance', 'monthly_fee', 'interest_rate', 'user')
 
 
 class UserSerializer(serializers.ModelSerializer):
