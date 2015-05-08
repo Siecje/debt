@@ -92,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def create_user(self, request):
         serialized = UserSerializer(data=request.DATA)
         if serialized.is_valid():
-            User.objects.create_user(
+            user = User.objects.create_user(
                 email=serialized.init_data['email'],
                 username=serialized.init_data['username'],
                 password=serialized.init_data['password']
