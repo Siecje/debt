@@ -112,20 +112,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return User.objects.filter(pk=self.request.user.pk)
 
 
-# TODO: move to model method
-def debt_cost(debt):
-    if isinstance(debt, Overdraft):
-        return debt.balance * debt.interest_rate/100 + 12 * debt.monthly_fee
-    elif isinstance(debt, CreditCard):
-        return debt.balance * debt.interest_rate/100 + debt.annual_fee
-
-
 def sort_debts(debts):
     moved = True
     while moved:
         moved = False
         for index in range(1, len(debts)):
-            if debt_cost(debts[index-1]) < debt_cost(debts[index]):
+            if debts[index-1].cost() < debts[index].cost():
                 moved = True
                 temp = debts[index-1]
                 debts[index-1] = debts[index]

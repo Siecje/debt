@@ -74,8 +74,12 @@ class CreditCard(Common):
             'balance': self.balance,
             'min_payment': self.min_payment,
             'min_payment_percent': self.min_payment_percent,
-            'annual_fee': self.annual_fee
+            'annual_fee': self.annual_fee,
+            'type': 'credit-card'
         }
+
+    def cost(self):
+        return self.balance * (self.interest_rate / 100) + self.annual_fee
 
 
 class Overdraft(Common):
@@ -98,8 +102,12 @@ class Overdraft(Common):
             'name': self.name,
             'interest_rate': self.interest_rate,
             'balance': self.balance,
-            'monthly_fee': self.monthly_fee
+            'monthly_fee': self.monthly_fee,
+            'type': 'overdraft'
         }
+
+    def cost(self):
+        return self.balance * (self.interest_rate / 100) + self.monthly_fee * 12
 
 
 from django.conf import settings

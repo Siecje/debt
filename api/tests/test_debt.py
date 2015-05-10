@@ -29,7 +29,7 @@ class DebtTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
-            JSONRenderer().render([CreditCardSerializer(credit_card).data]))
+            JSONRenderer().render([credit_card.to_JSON()]))
 
     def test_credit_cards_sorted_by_interest_rate(self):
         card1 = CreditCard.objects.create(
@@ -43,8 +43,7 @@ class DebtTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render([CreditCardSerializer(card2).data,
-                                        CreditCardSerializer(card1).data]))
+                 JSONRenderer().render([card2.to_JSON(), card1.to_JSON()]))
 
     def test_debts_sorted_by_fee(self):
         """
@@ -64,8 +63,8 @@ class DebtTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render([OverdraftSerializer(overdraft).data,
-                                        CreditCardSerializer(card).data]))
+                 JSONRenderer().render([overdraft.to_JSON(),
+                                        card.to_JSON()]))
 
     def test_debts_sorted_properly(self):
         """
@@ -84,8 +83,7 @@ class DebtTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                  JSONRenderer().render([CreditCardSerializer(card1).data,
-                                         CreditCardSerializer(card2).data]))
+                  JSONRenderer().render([card1.to_JSON(), card2.to_JSON()]))
 
     def test_debts_cc_and_overdraft_sorted(self):
         card = CreditCard.objects.create(
@@ -98,5 +96,5 @@ class DebtTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render([CreditCardSerializer(card).data,
-                                        OverdraftSerializer(overdraft).data]))
+                 JSONRenderer().render([card.to_JSON(),
+                                        overdraft.to_JSON()]))
