@@ -1,12 +1,12 @@
+from datetime import datetime
 import json
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient, APITestCase
 from api.serializers import CreditCardSerializer, OverdraftSerializer
-from api.models import CreditCard, Overdraft
+from api.models import CreditCard, Income, Overdraft, User
 
 
 class DebtTests(APITestCase):
@@ -98,3 +98,21 @@ class DebtTests(APITestCase):
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
                  JSONRenderer().render([card.to_JSON(),
                                         overdraft.to_JSON()]))
+
+    def test_timeline(self):
+        income = Income.objects.create(
+            name='Job',
+            user=self.user,
+            amount=200,
+            frequency=30,
+            date=datetime.now()
+        )
+        card = CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        url = reverse('get-timeline')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+                 JSONRenderer().render({'num_months': 6}))

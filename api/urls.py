@@ -117,7 +117,10 @@ urlpatterns = format_suffix_patterns([
         name='user-detail'),
     url(r'^debts/?$',
         views.get_debts,
-        name='get-debts')
+        name='get-debts'),
+    url(r'^timeline/?$',
+        views.get_debt_timeline,
+        name='get-timeline')
 ])
 
 urlpatterns += [

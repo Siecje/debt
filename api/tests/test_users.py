@@ -1,10 +1,10 @@
 import json
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient, APITestCase
+from api.models import User
 from api.serializers import UserSerializer
 
 

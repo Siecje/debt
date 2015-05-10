@@ -1,7 +1,29 @@
 import uuid
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as AuthUser
 from django.core.urlresolvers import reverse
 from django.db import models
+
+
+class User(AuthUser):
+    class Meta:
+        proxy = True
+
+    def get_total_income(self):
+        return sum([income.amount for income in self.incomes.all()])
+
+    def get_expenses(self):
+        return sum([expense.amount for expense in self.expenses.all()])
+
+    def get_minimum_payments(self):
+        return sum([credit_card.min_payment for credit_card in self.credit_cards.all()])
+
+    def get_debt(self):
+        return (sum([credit_card.balance for credit_card in self.credit_cards.all()])
+                + sum([overdraft.balance for overdraft in self.overdrafts.all()]))
+
+    def get_money_after_expenses(self):
+        # monthly
+        return self.get_total_income() - self.get_expenses() - self.get_minimum_payments()
 
 
 class Common(models.Model):
@@ -81,6 +103,36 @@ class CreditCard(Common):
     def cost(self):
         return self.balance * (self.interest_rate / 100) + self.annual_fee
 
+    def timeline(self, monthly_payment=None):
+        """ Given a monthly payment how long will it take to pay off """
+        amount = self.balance
+        interest = 0
+        points = []
+        total_paid = 0
+        total_interest = 0
+
+        while amount > 0:
+            interest = amount * (self.interest_rate / 100 / 12)
+            total_interest += interest
+            amount += interest
+            payment = monthly_payment or amount * self.min_payment_percent
+
+            if payment < self.min_payment:
+                payment = self.min_payment
+
+            if payment > amount:
+                payment = amount
+
+            total_paid += payment
+            amount -= payment
+            points.append(amount)
+
+        return {
+            'months': len(points),
+            'total_interest_paid': total_interest,
+            'total_paid': total_paid
+        }
+
 
 class Overdraft(Common):
     name = models.TextField()
@@ -117,7 +169,7 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+@receiver(post_save, sender=User)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)

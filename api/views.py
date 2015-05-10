@@ -1,10 +1,9 @@
-from django.contrib.auth.models import User
 from rest_framework import filters, permissions, serializers, status, viewsets
 from rest_framework.decorators import api_view, list_route
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from .models import CreditCard, Expense, Income, Overdraft, Type
+from .models import CreditCard, Expense, Income, Overdraft, Type, User
 from .serializers import CreditCardSerializer, ExpenseSerializer, \
                          IncomeSerializer, OverdraftSerializer, \
                          TypeSerializer, UserSerializer, CreateUserSerializer
@@ -130,7 +129,25 @@ def get_debts(request):
     overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
     credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
     result = sort_debts(list(overdrafts) + list(credit_cards))
+
     serialized = []
     for debt in result:
         serialized.append(debt.to_JSON())
     return Response(serialized)
+
+
+@api_view(['GET'])
+def get_debt_timeline(request):
+    overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
+    credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
+    debts = sort_debts(list(overdrafts) + list(credit_cards))
+
+    num_months = 0
+    user = User.objects.get(username=request.user.username)
+    amount = user.get_money_after_expenses()
+
+    for debt in debts:
+        num_months += debt.timeline(amount)['months']
+        amount += debt.min_payment
+
+    return Response({'num_months': num_months})
