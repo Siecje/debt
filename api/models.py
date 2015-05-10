@@ -66,11 +66,23 @@ class CreditCard(Common):
     def get_absolute_url(self):
         return reverse('credit-card-detail', kwargs={'id': self.id})
 
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'interest_rate': self.interest_rate,
+            'balance': self.balance,
+            'min_payment': self.min_payment,
+            'min_payment_percent': self.min_payment_percent,
+            'annual_fee': self.annual_fee
+        }
+
 
 class Overdraft(Common):
     name = models.TextField()
     balance = models.IntegerField()
     monthly_fee = models.IntegerField()
+    interest_rate = models.FloatField()
 
     user = models.ForeignKey(User, related_name='overdrafts')
 
@@ -80,12 +92,22 @@ class Overdraft(Common):
     def get_absolute_url(self):
         return reverse('overdraft-detail', kwargs={'id': self.id})
 
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'interest_rate': self.interest_rate,
+            'balance': self.balance,
+            'monthly_fee': self.monthly_fee
+        }
+
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

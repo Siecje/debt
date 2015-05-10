@@ -5,30 +5,98 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient, APITestCase
-from api.serializers import CreditCardSerializer
-from api.models import CreditCard
+from api.serializers import CreditCardSerializer, OverdraftSerializer
+from api.models import CreditCard, Overdraft
 
 
 class DebtTests(APITestCase):
-    def test_get_debts(self):
-        """
-        Ensure we can create a new account object.
-        """
-        # Create a user with some debts
-        user_one = User.objects.create_user(
+
+    def setUp(self):
+        self.user = User.objects.create_user(
             username='one', email='one@exmaple.com', password='one')
 
-        credit_card = CreditCard(name='First', interest_rate='20',
-                                 balance='1000', min_payment='100',
-                                 min_payment_percent='15', annual_fee='100',
-                                 user=user_one)
-
-        credit_card.save()
-        token = Token.objects.get(user__username=user_one.username)
+        token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('get-debts')
 
-        url = reverse('get-debts')
-        response = self.client.get(url)
+    def test_get_debts(self):
+        credit_card = CreditCard.objects.create(
+            name='First', interest_rate=20.0,
+            balance=1000, min_payment=10,
+            min_payment_percent=15.0, annual_fee=100,
+            user=self.user)
+
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(json.dumps(json.loads(response.content)),
             JSONRenderer().render([CreditCardSerializer(credit_card).data]))
+
+    def test_credit_cards_sorted_by_interest_rate(self):
+        card1 = CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        card2 = CreditCard.objects.create(
+            name='Two', interest_rate=20.1, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+                 JSONRenderer().render([CreditCardSerializer(card2).data,
+                                        CreditCardSerializer(card1).data]))
+
+    def test_debts_sorted_by_fee(self):
+        """
+        Montly/Annual costs should be factored
+        Though the annual fee with for a credit card will not go away
+        when the debt is paid, the card should be cancelled so you can pay off
+        other debt sooner.
+        If it is the last debt then it doesn't matter.
+        """
+        card = CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        overdraft = Overdraft.objects.create(
+            name='Over', interest_rate=20.0, balance=1000,
+            monthly_fee=9, user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+                 JSONRenderer().render([OverdraftSerializer(overdraft).data,
+                                        CreditCardSerializer(card).data]))
+
+    def test_debts_sorted_properly(self):
+        """
+        Interest rate, fees, should be taken into consideration
+        """
+        # An example where the higher interest rate
+        # will not cost more than the annual fee
+        card1 = CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=111, user=self.user)
+        card2 = CreditCard.objects.create(
+            name='Two', interest_rate=21.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+                  JSONRenderer().render([CreditCardSerializer(card1).data,
+                                         CreditCardSerializer(card2).data]))
+
+    def test_debts_cc_and_overdraft_sorted(self):
+        card = CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+                           annual_fee=100, user=self.user)
+        overdraft = Overdraft.objects.create(
+            name='Over', interest_rate=21.0, balance=1000,
+            monthly_fee=5, user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(json.dumps(json.loads(response.content)),
+                 JSONRenderer().render([CreditCardSerializer(card).data,
+                                        OverdraftSerializer(overdraft).data]))
