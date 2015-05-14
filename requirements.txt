@@ -1,5 +1,6 @@
-Django==1.8
+Django==1.8.1
 argparse==1.2.1
+coverage==3.7.1
 django-cors-headers==1.0.0
 djangorestframework==3.1.1
 psycopg2==2.6

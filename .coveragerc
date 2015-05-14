@@ -1,0 +1,13 @@
+[run]
+branch = True
+include = api/*,debt/*
+omit = *wsgi.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __unicode__
+
+[html]
+directory = tmp/coverage
