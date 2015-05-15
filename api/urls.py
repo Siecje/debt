@@ -1,5 +1,4 @@
 from django.conf.urls import include, url
-from django.contrib import admin
 from rest_framework.authtoken import views as auth_views
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views

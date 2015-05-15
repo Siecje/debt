@@ -1,6 +1,5 @@
-from rest_framework import filters, permissions, serializers, status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import api_view, list_route
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Overdraft, Type, User

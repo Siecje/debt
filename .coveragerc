@@ -8,6 +8,7 @@ exclude_lines =
     pragma: no cover
     def __repr__
     def __unicode__
+    def __str__
 
 [html]
 directory = tmp/coverage
