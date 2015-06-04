@@ -8,9 +8,11 @@
   - [x]Credit Cards
   - [x]Overdrafts
   - [ ]Loans
+  - [x]Investments
+  - [x]Tax Brackets
 - [x]Calculate which debt to pay off
 - [x]Calculate time till debt free
-- [ ]Investment Advice after debt free
+- [ ]Visualize net worth using money in different accounts
 
 ##Development Setup
 

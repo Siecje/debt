@@ -64,6 +64,30 @@ type_detail = views.TypeViewSet.as_view({
     'delete': 'destroy'
 })
 
+investment_list = views.InvestmentViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+investment_detail = views.InvestmentViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+taxbracket_list = views.TaxBracketViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+taxbracket_detail = views.TaxBracketViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 user_list = views.UserViewSet.as_view({
     'get': 'list',
     'post': 'create_user'
@@ -108,6 +132,18 @@ urlpatterns = format_suffix_patterns([
     url(r'^types/(?P<id>[^/]+)/?$',
         type_detail,
         name='type-detail'),
+    url(r'^investments/?$',
+        investment_list,
+        name='investment-list'),
+    url(r'^investments/(?P<id>[^/]+)/?$',
+        investment_detail,
+        name='investment-detail'),
+    url(r'^taxbrackets/?$',
+        taxbracket_list,
+        name='taxbracket-list'),
+    url(r'^taxbrackets/(?P<id>[^/]+)/?$',
+        taxbracket_detail,
+        name='taxbracket-detail'),
     url(r'^users/?$',
         user_list,
         name='user-list'),

@@ -2,6 +2,9 @@ import uuid
 from django.contrib.auth.models import User as AuthUser
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 
 class User(AuthUser):
@@ -24,6 +27,12 @@ class User(AuthUser):
     def get_money_after_expenses(self):
         # monthly
         return self.get_total_income() - self.get_expenses() - self.get_minimum_payments()
+
+
+@receiver(post_save, sender=User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
 
 
 class Common(models.Model):
@@ -162,12 +171,33 @@ class Overdraft(Common):
         return self.balance * (self.interest_rate / 100) + self.monthly_fee * 12
 
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+class Investment(Common):
+    name = models.TextField()
+    interest_rate = models.FloatField()
+    # min_duration is in months
+    # 0 means you can access it at any time
+    min_duration = models.IntegerField()
+    balance = models.IntegerField()
+
+    user = models.ForeignKey(User, related_name='investments')
+
+    def __str__(self):
+        return self.name
 
 
-@receiver(post_save, sender=User)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
+class TaxBracket(Common):
+    lower = models.IntegerField()
+    upper = models.IntegerField()
+    tax_rate = models.FloatField()
+    # group is used for displaying tax brackets together
+    # for example federal vs provincial
+    group = models.TextField()
+
+    user = models.ForeignKey(User, related_name='tax_brackets')
+
+    def __str__(self):
+        return '%s %d - %d' % (self.tax_rate, self.lower, self.upper)
+
+    def clean(self):
+        if self.upper != 0 and self.upper < self.lower:
+            raise ValidationError('The upper bound must be larger than the lower bound.')

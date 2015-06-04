@@ -2,10 +2,10 @@ from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import api_view, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from .models import CreditCard, Expense, Income, Overdraft, Type, User
+from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBracket, Type, User
 from .serializers import CreditCardSerializer, ExpenseSerializer, \
-                         IncomeSerializer, OverdraftSerializer, \
-                         TypeSerializer, UserSerializer, CreateUserSerializer
+                         IncomeSerializer, InvestmentSerializer, OverdraftSerializer, \
+                         TaxBracketSerializer, TypeSerializer, UserSerializer, CreateUserSerializer
 
 
 @api_view(('GET',))
@@ -63,6 +63,22 @@ class OverdraftViewSet(viewsets.ModelViewSet):
 class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = 'id'
+
+
+class InvestmentViewSet(viewsets.ModelViewSet):
+    queryset = Investment.objects.all()
+    serializer_class = InvestmentSerializer
+    filter_backends = (IsOwnerFilterBackend,)
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = 'id'
+
+
+class TaxBracketViewSet(viewsets.ModelViewSet):
+    queryset = TaxBracket.objects.all()
+    serializer_class = TaxBracketSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'

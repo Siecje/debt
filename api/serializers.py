@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import CreditCard, Expense, Income, Overdraft, Type
+from .models import CreditCard, Expense, Income, Investment, \
+                    Overdraft, TaxBracket, Type
 
 
 class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -81,6 +82,26 @@ class OverdraftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Overdraft
         fields = ('id', 'name', 'balance', 'monthly_fee', 'interest_rate', 'user')
+
+
+class InvestmentSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = Investment
+        fields = ('id', 'name', 'interest_rate', 'min_duration', 'balance', 'user')
+
+
+class TaxBracketSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = TaxBracket
+        fields = ('id', 'lower', 'upper', 'tax_rate', 'group', 'user')
 
 
 class UserSerializer(serializers.ModelSerializer):
