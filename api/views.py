@@ -16,6 +16,8 @@ def api_root(request, format=None):
         'incomes': reverse('income-list', request=request, format=format),
         'overdrafts': reverse('overdraft-list', request=request, format=format),
         'types': reverse('type-list', request=request, format=format),
+        'investments': reverse('investment-list', request=request, format=format),
+        'tax-brackets': reverse('taxbracket-list', request=request, format=format),
         'auth-token': reverse('auth-token', request=request, format=format)
     })
 
