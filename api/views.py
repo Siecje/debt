@@ -109,9 +109,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if serialized.is_valid():
             user = User(
                 email=serialized.data.get('email'),
-                username=serialized.data.get('username'),
-                # Will be true after email verification
-                is_active=False
+                username=serialized.data.get('username')
             )
             user.set_password(serialized.data.get('password'))
             user.save()
