@@ -1,5 +1,6 @@
 import uuid
 from django.contrib.auth.models import User as AuthUser
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
@@ -8,6 +9,7 @@ from rest_framework.authtoken.models import Token
 
 
 class User(AuthUser):
+
     class Meta:
         proxy = True
 
@@ -29,7 +31,7 @@ class User(AuthUser):
         return self.get_total_income() - self.get_expenses() - self.get_minimum_payments()
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=AuthUser)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
@@ -52,7 +54,7 @@ class Income(Common):
     # One of your pay days
     date = models.DateField()
 
-    user = models.ForeignKey(User, related_name='incomes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='incomes')
 
     def __str__(self):
         return self.name
@@ -63,7 +65,7 @@ class Income(Common):
 
 class Type(Common):
     name = models.TextField()
-    user = models.ForeignKey(User, related_name='types')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='types')
 
     def __str__(self):
         return self.name
@@ -78,7 +80,7 @@ class Expense(Common):
     frequency = models.IntegerField(default=0)
 
     type = models.ForeignKey(Type, related_name='expenses')
-    user = models.ForeignKey(User, related_name='expenses')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='expenses')
 
 
 class CreditCard(Common):
@@ -89,7 +91,7 @@ class CreditCard(Common):
     min_payment_percent = models.FloatField()
     annual_fee = models.IntegerField()
 
-    user = models.ForeignKey(User, related_name='credit_cards')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credit_cards')
 
     def __str__(self):
         return self.name
@@ -149,7 +151,7 @@ class Overdraft(Common):
     monthly_fee = models.IntegerField()
     interest_rate = models.FloatField()
 
-    user = models.ForeignKey(User, related_name='overdrafts')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='overdrafts')
 
     def __str__(self):
         return self.name
@@ -179,7 +181,7 @@ class Investment(Common):
     min_duration = models.IntegerField()
     balance = models.IntegerField()
 
-    user = models.ForeignKey(User, related_name='investments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='investments')
 
     def __str__(self):
         return self.name
@@ -193,7 +195,7 @@ class TaxBracket(Common):
     # for example federal vs provincial
     group = models.TextField()
 
-    user = models.ForeignKey(User, related_name='tax_brackets')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tax_brackets')
 
     def __str__(self):
         return '%s %d - %d' % (self.tax_rate, self.lower, self.upper)
