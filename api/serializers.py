@@ -8,7 +8,7 @@ class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'url')
-        lookup_field = 'id'
+        lookup_field = 'pk'
 
 
 class RelatedExpenseSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,6 +57,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
+    type = RelatedTypeSerializer()
 
     class Meta:
         model = Expense
