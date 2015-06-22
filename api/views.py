@@ -111,7 +111,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['POST'])
     def create_user(self, request):
-        serialized = CreateUserSerializer(data=request.DATA)
+        serialized = CreateUserSerializer(data=request.data)
         if serialized.is_valid():
             user = User(
                 email=serialized.data.get('email'),
