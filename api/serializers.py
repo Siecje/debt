@@ -53,11 +53,21 @@ class TypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'user', 'expenses', 'created', 'updated')
 
 
-class ExpenseSerializer(serializers.ModelSerializer):
+class DisplayExpenseSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
     type = RelatedTypeSerializer()
+
+    class Meta:
+        model = Expense
+        fields = ('id', 'name', 'amount', 'frequency', 'type', 'user', 'created', 'updated')
+
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         model = Expense

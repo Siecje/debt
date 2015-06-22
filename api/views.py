@@ -1,9 +1,9 @@
 from rest_framework import filters, permissions, status, viewsets
-from rest_framework.decorators import api_view, list_route
+from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBracket, Type, User
-from .serializers import CreditCardSerializer, ExpenseSerializer, \
+from .serializers import CreditCardSerializer, ExpenseSerializer, DisplayExpenseSerializer, \
                          IncomeSerializer, InvestmentSerializer, OverdraftSerializer, \
                          TaxBracketSerializer, TypeSerializer, UserSerializer, CreateUserSerializer
 
@@ -44,6 +44,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
     lookup_field = 'id'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            # Displays type.name
+            return DisplayExpenseSerializer
+        return ExpenseSerializer
 
 
 class IncomeViewSet(viewsets.ModelViewSet):

@@ -1,10 +1,7 @@
-import json
 from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 from api.models import TaxBracket, User
-from api.serializers import TaxBracketSerializer
 
 
 class TaxBracketTests(APITestCase):
@@ -24,5 +21,3 @@ class TaxBracketTests(APITestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        #self.assertJSONEqual(json.dumps(json.loads(response.content)),
-        #    JSONRenderer().render(TaxBracketSerializer(data=tax_bracket)))

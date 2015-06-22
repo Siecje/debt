@@ -1,10 +1,7 @@
-import json
 from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 from api.models import Investment, User
-from api.serializers import InvestmentSerializer
 
 
 class InvestmentTests(APITestCase):
