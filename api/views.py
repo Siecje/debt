@@ -122,7 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
             return Response(UserSerializer(user).data,
                             status=status.HTTP_201_CREATED)
-        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
         if self.request.user.is_anonymous():
