@@ -198,7 +198,7 @@ class TaxBracket(Common):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tax_brackets')
 
     def __str__(self):
-        return '%s %d - %d' % (self.tax_rate, self.lower, self.upper)
+        return '{0}% {1} - {2}'.format(self.tax_rate, self.lower, self.upper)
 
     def clean(self):
         if self.upper != 0 and self.upper < self.lower:
