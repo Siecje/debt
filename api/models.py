@@ -113,7 +113,8 @@ class CreditCard(Common):
         }
 
     def cost(self):
-        return self.balance * (self.interest_rate / 100) + self.annual_fee
+        """ Amount that it is costing each month """
+        return self.balance * (self.interest_rate / (100 * 12)) + self.annual_fee / float(12)
 
     def timeline(self, monthly_payment=None):
         """ Given a monthly payment how long will it take to pay off """
@@ -127,6 +128,8 @@ class CreditCard(Common):
             interest = amount * (self.interest_rate / 100 / 12)
             total_interest += interest
             amount += interest
+            if len(points) % 12 == 0:
+                amount += self.annual_fee
             payment = monthly_payment or amount * self.min_payment_percent
 
             if payment < self.min_payment:
@@ -140,7 +143,8 @@ class CreditCard(Common):
             points.append(amount)
 
         return {
-            'months': len(points),
+            'debt_per_month': points,
+            'num_months': len(points),
             'total_interest_paid': total_interest,
             'total_paid': total_paid
         }
@@ -171,7 +175,41 @@ class Overdraft(Common):
         }
 
     def cost(self):
-        return self.balance * (self.interest_rate / 100) + self.monthly_fee * 12
+        """ Amount that it is costing each month """
+        return self.balance * (self.interest_rate / (100 * 12)) + self.monthly_fee
+
+    def timeline(self, monthly_payment):
+        """ Given a monthly payment how long will it take to pay off """
+        amount = self.balance
+        interest = 0
+        points = []
+        total_paid = 0
+        total_interest = 0
+
+        previous_amount = amount
+
+        while amount > 0:
+            interest = amount * (self.interest_rate / 100)
+            total_interest += interest
+            amount += interest
+            amount += self.monthly_fee
+            payment = monthly_payment
+
+            if payment > amount:
+                payment = amount
+
+            total_paid += payment
+            amount -= payment
+            points.append(amount)
+            if amount > previous_amount:
+                break
+
+        return {
+            'debt_per_month': points,
+            'num_months': len(points),
+            'total_interest_paid': total_interest,
+            'total_paid': total_paid
+        }
 
 
 class Investment(Common):

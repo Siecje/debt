@@ -45,11 +45,7 @@ class DebtTests(APITestCase):
 
     def test_debts_sorted_by_fee(self):
         """
-        Montly/Annual costs should be factored
-        Though the annual fee with for a credit card will not go away
-        when the debt is paid, the card should be cancelled so you can pay off
-        other debt sooner.
-        If it is the last debt then it doesn't matter.
+        Montly/Annual costs should be considered
         """
         card = CreditCard.objects.create(
             name='One', interest_rate=20.0, balance=1000,
@@ -97,7 +93,7 @@ class DebtTests(APITestCase):
                  JSONRenderer().render([card.to_JSON(),
                                         overdraft.to_JSON()]))
 
-    def test_timeline(self):
+    def test_timeline_with_credit_card(self):
         Income.objects.create(
             name='Job',
             user=self.user,
@@ -112,5 +108,24 @@ class DebtTests(APITestCase):
         url = reverse('get-timeline')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render({'num_months': 6}))
+        self.assertEqual(json.loads(response.content)['num_months'], 7)
+
+    def test_timeline_with_credit_card_and_overdraft(self):
+        Income.objects.create(
+            name='Job',
+            user=self.user,
+            amount=200,
+            frequency=30,
+            date=datetime.now()
+        )
+        CreditCard.objects.create(
+            name='One', interest_rate=20.0, balance=1000,
+            min_payment=10, min_payment_percent=10.0,
+            annual_fee=100, user=self.user)
+        overdraft = Overdraft.objects.create(
+            name='Over', interest_rate=20.0, balance=1000,
+            monthly_fee=9, user=self.user)
+        url = reverse('get-timeline')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['num_months'], 8)

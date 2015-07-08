@@ -6,6 +6,7 @@ from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBrack
 from .serializers import CreditCardSerializer, ExpenseSerializer, DisplayExpenseSerializer, \
                          IncomeSerializer, InvestmentSerializer, OverdraftSerializer, \
                          TaxBracketSerializer, TypeSerializer, UserSerializer, CreateUserSerializer
+from .utils import sort_debts
 
 
 @api_view(('GET',))
@@ -132,21 +133,13 @@ class UserViewSet(viewsets.ModelViewSet):
         return User.objects.filter(pk=self.request.user.pk)
 
 
-def sort_debts(debts):
-    moved = True
-    while moved:
-        moved = False
-        for index in range(1, len(debts)):
-            if debts[index-1].cost() < debts[index].cost():
-                moved = True
-                temp = debts[index-1]
-                debts[index-1] = debts[index]
-                debts[index] = temp
-    return debts
-
-
 @api_view(['GET'])
 def get_debts(request):
+    """
+    Though the annual fee with for a credit card will not go away
+    when the debt is paid, the card should be cancelled so you can pay off
+    other debt sooner.
+    """
     overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
     credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
     result = sort_debts(list(overdrafts) + list(credit_cards))
@@ -165,10 +158,29 @@ def get_debt_timeline(request):
 
     num_months = 0
     user = User.objects.get(username=request.user.username)
-    amount = user.get_money_after_expenses()
+    # Amount to put towards debts
+    payment = user.get_money_after_expenses()
+    # Amount of debt each month
+    debt_per_month = []
 
-    for debt in debts:
-        num_months += debt.timeline(amount)['months']
-        amount += debt.min_payment
+    for index, debt in enumerate(debts):
+        result = debt.timeline(payment)
+        # The current debt has been eliminated
+        num_months += result['num_months']
+        # Total debt each month for current debt
+        debt_per_month = result['debt_per_month']
+        if hasattr(debt, 'min_payment'):
+            payment += debt.min_payment
+        for debt in debts[index:]:
+            # Need to add the debt owing on each of the other debts
+            # minus the minimum payment for each month
+            for month in debt_per_month:
+                if hasattr(debt, 'min_payment'):
+                    month += debt.balance + debt.cost() - debt.min_payment
+                else:
+                    month += debt.balance + debt.cost()
 
-    return Response({'num_months': num_months})
+    return Response({
+        'num_months': num_months,
+        'debt_per_month': debt_per_month
+    })
