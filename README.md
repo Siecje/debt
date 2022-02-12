@@ -1,6 +1,6 @@
-#Debt API
+# Debt API
 
-##Features
+## Features
 
 - Models
   - [x]Incomes
@@ -14,7 +14,7 @@
 - [x]Calculate time till debt free
 - [ ]Visualize net worth with money in different accounts
 
-##Development Setup
+## Development Setup
 
 ```shell
 python3 -m venv venv
@@ -33,16 +33,16 @@ python manage.py runserver
 
 The API is now available at [http://localhost:8000/api/v1.0/](http://localhost:8000/api/v1.0/)
 
-##Usage
+## Usage
 
-###Create User
+### Create User
 
 ```shell
 http --json POST http://localhost:8000/api/v1.0/users \
 username=username password=password email=username@example.com
 ```
 
-###Authentication
+### Authentication
 
 ```shell
 http --json POST http://localhost:8000/api/v1.0/auth/token \
@@ -62,6 +62,8 @@ X-Frame-Options: SAMEORIGIN
 }
 ```
 
+### Get Data
+
 ```shell
 $ TOKEN=ae25e52afb6d929bdcca7f413d26043b5ae5348d
 # Authenticated requests use 'Authorization: Token'
@@ -69,7 +71,7 @@ $ http --json GET http://localhost:8000/api/v1.0/credit-cards \
 "Authorization:Token "$TOKEN""
 ```
 
-##Tests
+## Tests
 
 ```shell
 coverage run --source='.' manage.py test
