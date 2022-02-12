@@ -37,14 +37,14 @@ The API is now available at [http://localhost:8000/api/v1.0/](http://localhost:8
 ### Create User
 
 ```shell
-http --json POST http://localhost:8000/api/v1.0/users \
+http --json POST http://localhost:8000/api/v1.0/users/ \
 username=username password=password email=username@example.com
 ```
 
 ### Authentication
 
 ```shell
-http --json POST http://localhost:8000/api/v1.0/auth/token \
+http --json POST http://localhost:8000/api/v1.0/auth/token/ \
 username=username password=password
 ```
 
@@ -66,7 +66,7 @@ X-Frame-Options: SAMEORIGIN
 ```shell
 $ TOKEN=ae25e52afb6d929bdcca7f413d26043b5ae5348d
 # Authenticated requests use 'Authorization: Token'
-$ http --json GET http://localhost:8000/api/v1.0/credit-cards \
+$ http --json GET http://localhost:8000/api/v1.0/credit-cards/ \
 "Authorization:Token "$TOKEN""
 ```
 
