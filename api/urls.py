@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 from rest_framework.authtoken import views as auth_views
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
@@ -100,66 +100,66 @@ user_detail = views.UserViewSet.as_view({
     'delete': 'destroy'
 })
 
-urlpatterns = format_suffix_patterns([
-    url(r'^$', views.api_root),
-    url(r'^credit-cards/?$',
+# urlpatterns = format_suffix_patterns([
+urlpatterns = [
+    path('', views.api_root),
+    path('credit-cards/',
         creditcard_list,
         name='creditcard-list'),
-    url(r'^credit-cards/(?P<id>[^/]+)/?$',
+    path('credit-cards/<uuid:pk>/',
          creditcard_detail,
          name='creditcard-detail'),
-    url(r'^expenses/?$',
+    path('expenses/',
         expense_list,
         name='expense-list'),
-    url(r'^expenses/(?P<id>[^/]+)/?$',
+    path('expenses/<uuid:pk>/',
          expense_detail,
          name='expense-detail'),
-    url(r'^incomes/?$',
+    path('incomes/',
         income_list,
         name='income-list'),
-    url(r'^incomes/(?P<id>[^/]+)/?$',
+    path('incomes/<uuid:pk>/',
          income_detail,
          name='income-detail'),
-    url(r'^overdrafts/?$',
+    path('overdrafts/',
         overdraft_list,
         name='overdraft-list'),
-    url(r'^overdrafts/(?P<id>[^/]+)/?$',
+    path('overdrafts/<uuid:pk>/',
         overdraft_detail,
         name='overdraft-detail'),
-    url(r'^types/?$',
+    path('types/',
         type_list,
         name='type-list'),
-    url(r'^types/(?P<id>[^/]+)/?$',
+    path('types/<uuid:pk>/',
         type_detail,
         name='type-detail'),
-    url(r'^investments/?$',
+    path('investments/',
         investment_list,
         name='investment-list'),
-    url(r'^investments/(?P<id>[^/]+)/?$',
+    path('investments/<uuid:pk>/',
         investment_detail,
         name='investment-detail'),
-    url(r'^taxbrackets/?$',
+    path('taxbrackets/',
         taxbracket_list,
         name='taxbracket-list'),
-    url(r'^taxbrackets/(?P<id>[^/]+)/?$',
+    path('taxbrackets/<uuid:pk>/',
         taxbracket_detail,
         name='taxbracket-detail'),
-    url(r'^users/?$',
+    path('users/',
         user_list,
         name='user-list'),
-    url(r'^users/(?P<pk>[0-9]+)/?$',
+    path('users/<int:pk>/',
         user_detail,
         name='user-detail'),
-    url(r'^debts/?$',
+    path('debts/',
         views.get_debts,
         name='get-debts'),
-    url(r'^timeline/?$',
+    path('timeline/',
         views.get_debt_timeline,
         name='get-timeline')
-])
+]
 
 urlpatterns += [
-    url(r'^auth/token/?$', auth_views.obtain_auth_token, name='auth-token'),
-    url(r'^auth/', include('rest_framework.urls',
-                           namespace='rest_framework')),
+    path('auth/token/', auth_views.obtain_auth_token, name='auth-token'),
+    path('auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

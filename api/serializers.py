@@ -19,14 +19,14 @@ class RelatedExpenseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Expense
         fields = ('id', 'name', 'amount', 'frequency', 'user')
-        lookup_field = 'id'
+        lookup_field = 'pk'
 
 
 class RelatedTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Type
         fields = ('id', 'url', 'name')
-        lookup_field = 'id'
+        lookup_field = 'pk'
 
 
 class IncomeSerializer(serializers.ModelSerializer):

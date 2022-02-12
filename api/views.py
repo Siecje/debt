@@ -1,5 +1,5 @@
 from rest_framework import filters, permissions, status, viewsets
-from rest_framework.decorators import api_view, detail_route, list_route
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBracket, Type, User
@@ -36,7 +36,7 @@ class CreditCardViewSet(viewsets.ModelViewSet):
     serializer_class = CreditCardSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -44,7 +44,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -58,7 +58,7 @@ class IncomeViewSet(viewsets.ModelViewSet):
     serializer_class = IncomeSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class OverdraftViewSet(viewsets.ModelViewSet):
@@ -66,7 +66,7 @@ class OverdraftViewSet(viewsets.ModelViewSet):
     serializer_class = OverdraftSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class TypeViewSet(viewsets.ModelViewSet):
@@ -74,7 +74,7 @@ class TypeViewSet(viewsets.ModelViewSet):
     serializer_class = TypeSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class InvestmentViewSet(viewsets.ModelViewSet):
@@ -82,7 +82,7 @@ class InvestmentViewSet(viewsets.ModelViewSet):
     serializer_class = InvestmentSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class TaxBracketViewSet(viewsets.ModelViewSet):
@@ -90,7 +90,7 @@ class TaxBracketViewSet(viewsets.ModelViewSet):
     serializer_class = TaxBracketSerializer
     filter_backends = (IsOwnerFilterBackend,)
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
 
 class IsAdminOrOwner(permissions.BasePermission):
@@ -110,7 +110,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdminOrOwner,)
 
-    @list_route(methods=['POST'])
+    @action(methods=['POST'], detail=False)
     def create_user(self, request):
         serialized = CreateUserSerializer(data=request.data)
         if serialized.is_valid():
@@ -126,7 +126,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             return User.objects.none()
         elif self.request.user.is_superuser:
             return User.objects.all()

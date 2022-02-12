@@ -1,7 +1,9 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
+
 from api.models import Investment, User
+from api.serializers import InvestmentSerializer
 
 
 class InvestmentTests(APITestCase):
@@ -21,5 +23,7 @@ class InvestmentTests(APITestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        #self.assertJSONEqual(json.dumps(json.loads(response.content)),
-        #    JSONRenderer().render(InvestmentSerializer(data=investment)))
+        self.assertJSONEqual(
+            response.content,
+            [InvestmentSerializer(investment).data],
+        )
