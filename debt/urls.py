@@ -1,8 +1,13 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
+
+
+schema_view = get_swagger_view(title='Debt API')
 
 urlpatterns = [
-    url(r'^api/v1.0/', include('api.urls')),
-    url(r'^docs/', include('rest_framework_swagger.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    path('api/v1.0/', include('api.urls')),
+    # path('docs/', rest_framework_swagger.urls),
+    path('docs/', schema_view),
+    path('admin/', admin.site.urls),
 ]

@@ -1,9 +1,10 @@
 import json
-from django.core.urlresolvers import reverse
+
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient, APITestCase
+
 from api.models import User
 from api.serializers import UserSerializer
 
@@ -50,11 +51,14 @@ class UserTests(APITestCase):
         """
         response = self.client.get(reverse('user-list'))
         self.assertEqual(len(response.data), 3)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-            JSONRenderer().render([
+        self.assertJSONEqual(
+            response.content,
+            [
                 UserSerializer(self.admin).data,
                 UserSerializer(self.user_one).data,
-                UserSerializer(self.user_two).data]))
+                UserSerializer(self.user_two).data
+            ],
+        )
 
     def test_admin_can_view_user_detail(self):
         """
@@ -63,8 +67,10 @@ class UserTests(APITestCase):
         url = reverse('user-detail', kwargs={'pk': self.user_one.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                         JSONRenderer().render(UserSerializer(self.user_one).data))
+        self.assertJSONEqual(
+            response.content,
+            UserSerializer(self.user_one).data,
+        )
 
     def test_admin_can_view_admin_detail(self):
         """
@@ -75,8 +81,10 @@ class UserTests(APITestCase):
         url = reverse('user-detail', kwargs={'pk': admin_two.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render(UserSerializer(admin_two).data))
+        self.assertJSONEqual(
+            response.content,
+            UserSerializer(admin_two).data,
+        )
 
     def test_anon_cannot_view_user_list(self):
         """
@@ -97,8 +105,10 @@ class UserTests(APITestCase):
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render([UserSerializer(self.user_one).data]))
+        self.assertJSONEqual(
+            response.content,
+            [UserSerializer(self.user_one).data],
+        )
 
     def test_user_can_view_own_detail(self):
         client = APIClient()
@@ -107,8 +117,10 @@ class UserTests(APITestCase):
         url = reverse('user-detail', kwargs={'pk': self.user_one.pk})
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(json.dumps(json.loads(response.content)),
-                 JSONRenderer().render(UserSerializer(self.user_one).data))
+        self.assertJSONEqual(
+            response.content,
+            UserSerializer(self.user_one).data,
+        )
 
     def test_user_cannot_view_another_user_detail(self):
         client = APIClient()

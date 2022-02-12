@@ -1,7 +1,9 @@
 import json
-from django.core.urlresolvers import reverse
+
+from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
+
 from api.models import Expense, Type, User
 
 
@@ -38,7 +40,7 @@ class ExpensesTests(APITestCase):
             frequency=1,
             type=self.type1,
             user=self.user)
-        url = reverse('expense-detail', kwargs={'id': expense.id})
+        url = reverse('expense-detail', kwargs={'pk': expense.id})
         data = {
             'name': 'Different',
             'amount': '100',
@@ -56,7 +58,7 @@ class ExpensesTests(APITestCase):
             frequency=1,
             type=self.type1,
             user=self.user)
-        url = reverse('expense-detail', kwargs={'id': expense.id})
+        url = reverse('expense-detail', kwargs={'pk': expense.id})
         data = {
             'type': self.type2.id
         }
@@ -70,7 +72,7 @@ class ExpensesTests(APITestCase):
             frequency=1,
             type=self.type1,
             user=self.user)
-        url = reverse('expense-detail', kwargs={'id': expense.id})
+        url = reverse('expense-detail', kwargs={'pk': expense.id})
         response = self.client.get(url)
         self.assertEqual(json.loads(response.content)['type']['name'], 'First')
 

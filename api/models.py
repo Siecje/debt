@@ -1,11 +1,13 @@
+import json
 import uuid
+
 from django.contrib.auth.models import User as AuthUser
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 
@@ -55,24 +57,33 @@ class Income(Common):
     # One of your pay days
     date = models.DateField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='incomes')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='incomes',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('income-detail', kwargs={'id': self.id})
+        return reverse('income-detail', kwargs={'pk': self.id})
 
 
 class Type(Common):
+    #TODO: Rename to ExpenseType or Tag?
     name = models.TextField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='types')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='types',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('type-detail', kwargs={'id': self.id})
+        return reverse('type-detail', kwargs={'pk': self.id})
 
 
 class Expense(Common):
@@ -80,8 +91,18 @@ class Expense(Common):
     amount = models.IntegerField()
     frequency = models.IntegerField(default=0)
 
-    type = models.ForeignKey(Type, related_name='expenses')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='expenses')
+    type = models.ForeignKey(
+        Type,
+        related_name='expenses',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='expenses',
+        on_delete=models.CASCADE,
+    )
 
 
 class CreditCard(Common):
@@ -92,17 +113,21 @@ class CreditCard(Common):
     min_payment_percent = models.FloatField()
     annual_fee = models.IntegerField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credit_cards')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='credit_cards',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('credit-card-detail', kwargs={'id': self.id})
+        return reverse('credit-card-detail', kwargs={'pk': self.id})
 
     def to_JSON(self):
         return {
-            'id': self.id,
+            'id': str(self.id),
             'name': self.name,
             'interest_rate': self.interest_rate,
             'balance': self.balance,
@@ -156,17 +181,21 @@ class Overdraft(Common):
     monthly_fee = models.IntegerField()
     interest_rate = models.FloatField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='overdrafts')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='overdrafts',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('overdraft-detail', kwargs={'id': self.id})
+        return reverse('overdraft-detail', kwargs={'pk': self.id})
 
     def to_JSON(self):
         return {
-            'id': self.id,
+            'id': str(self.id),
             'name': self.name,
             'interest_rate': self.interest_rate,
             'balance': self.balance,
@@ -220,7 +249,11 @@ class Investment(Common):
     min_duration = models.IntegerField()
     balance = models.IntegerField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='investments')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='investments',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
@@ -234,7 +267,11 @@ class TaxBracket(Common):
     # for example federal vs provincial
     group = models.TextField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tax_brackets')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='tax_brackets',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return '{0}% {1} - {2}'.format(self.tax_rate, self.lower, self.upper)
