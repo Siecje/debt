@@ -14,7 +14,10 @@ class ExpensesTests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username='one', email='one@exmaple.com', password='one')
+            username='one',
+            email='one@exmaple.com',
+            password='one',
+        )
 
         token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

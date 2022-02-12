@@ -10,7 +10,10 @@ class InvestmentTests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username='one', email='one@exmaple.com', password='one')
+            username='one',
+            email='one@exmaple.com',
+            password='one',
+        )
 
         token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -18,8 +21,12 @@ class InvestmentTests(APITestCase):
 
     def test_get_investments(self):
         investment = Investment.objects.create(
-            name='First', interest_rate=8.0,
-            min_duration=0, balance=1000, user=self.user)
+            name='First',
+            interest_rate=8.0,
+            min_duration=0,
+            balance=1000,
+            user=self.user,
+        )
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

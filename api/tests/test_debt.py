@@ -12,7 +12,10 @@ class DebtTests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username='one', email='one@exmaple.com', password='one')
+            username='one', 
+            email='one@exmaple.com', 
+            password='one',
+        )
 
         token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -20,10 +23,14 @@ class DebtTests(APITestCase):
 
     def test_get_debts(self):
         credit_card = CreditCard.objects.create(
-            name='First', interest_rate=20.0,
-            balance=1000, min_payment=10,
-            min_payment_percent=15.0, annual_fee=100,
-            user=self.user)
+            name='First',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=15.0,
+            annual_fee=100,
+            user=self.user,
+        )
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -34,13 +41,23 @@ class DebtTests(APITestCase):
 
     def test_credit_cards_sorted_by_interest_rate(self):
         card1 = CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         card2 = CreditCard.objects.create(
-            name='Two', interest_rate=20.1, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='Two',
+            interest_rate=20.1,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -53,12 +70,21 @@ class DebtTests(APITestCase):
         Montly/Annual costs should be considered
         """
         card = CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         overdraft = Overdraft.objects.create(
-            name='Over', interest_rate=20.0, balance=1000,
-            monthly_fee=9, user=self.user)
+            name='Over',
+            interest_rate=20.0,
+            balance=1000,
+            monthly_fee=9,
+            user=self.user,
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -73,13 +99,23 @@ class DebtTests(APITestCase):
         # An example where the higher interest rate
         # will not cost more than the annual fee
         card1 = CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=111, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=111,
+            user=self.user,
+        )
         card2 = CreditCard.objects.create(
-            name='Two', interest_rate=21.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='Two',
+            interest_rate=21.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -89,12 +125,21 @@ class DebtTests(APITestCase):
 
     def test_debts_cc_and_overdraft_sorted(self):
         card = CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-                           annual_fee=100, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         overdraft = Overdraft.objects.create(
-            name='Over', interest_rate=21.0, balance=1000,
-            monthly_fee=5, user=self.user)
+            name='Over',
+            interest_rate=21.0,
+            balance=1000,
+            monthly_fee=5,
+            user=self.user,
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -110,9 +155,14 @@ class DebtTests(APITestCase):
             pay_type=PayType.MONTHLY,
         )
         CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10,
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         url = reverse('get-timeline')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -126,12 +176,21 @@ class DebtTests(APITestCase):
             pay_type=PayType.SEMI_MONTHLY,
         )
         CreditCard.objects.create(
-            name='One', interest_rate=20.0, balance=1000,
-            min_payment=10, min_payment_percent=10.0,
-            annual_fee=100, user=self.user)
+            name='One',
+            interest_rate=20.0,
+            balance=1000,
+            min_payment=10, 
+            min_payment_percent=10.0,
+            annual_fee=100,
+            user=self.user,
+        )
         overdraft = Overdraft.objects.create(
-            name='Over', interest_rate=20.0, balance=1000,
-            monthly_fee=9, user=self.user)
+            name='Over',
+            interest_rate=20.0,
+            balance=1000,
+            monthly_fee=9,
+            user=self.user,
+        )
         url = reverse('get-timeline')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

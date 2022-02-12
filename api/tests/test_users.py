@@ -13,7 +13,10 @@ class UserTests(APITestCase):
     def setUp(self):
         # Create superuser for tests
         self.admin = User.objects.create_superuser(
-            username='Admin', email='admin@example.com', password='admin')
+            username='Admin',
+            email='admin@example.com',
+            password='admin',
+        )
         # Get token
         url = reverse('auth-token')
         data = {
@@ -26,9 +29,15 @@ class UserTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
 
         self.user_one = User.objects.create_user(
-            username='one', email='one@exmaple.com', password='one')
+            username='one',
+            email='one@exmaple.com',
+            password='one',
+        )
         self.user_two = User.objects.create_user(
-            username='two', email='two@exmaple.com', password='two')
+            username='two',
+            email='two@exmaple.com',
+            password='two',
+        )
 
     def test_create_account(self):
         """
@@ -77,7 +86,10 @@ class UserTests(APITestCase):
         Ensure admins can view an admin's detail page
         """
         admin_two = User.objects.create_superuser(
-            username='admin_two', email='admin_two@example.com', password='admin')
+            username='admin_two',
+            email='admin_two@example.com',
+            password='admin',
+        )
         url = reverse('user-detail', kwargs={'pk': admin_two.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
