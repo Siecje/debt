@@ -122,8 +122,8 @@ class DebtTests(APITestCase):
         Income.objects.create(
             name='Job',
             user=self.user,
-            amount=200,
-            pay_type=PayType.MONTHLY,
+            amount=100,
+            pay_type=PayType.SEMI_MONTHLY,
         )
         CreditCard.objects.create(
             name='One', interest_rate=20.0, balance=1000,

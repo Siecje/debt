@@ -17,8 +17,8 @@ class User(AuthUser):
     class Meta:
         proxy = True
 
-    def get_total_income(self):
-        return sum([income.amount for income in self.incomes.all()])
+    def get_total_monthly_income(self):
+        return sum([income.get_monthly_income() for income in self.incomes.all()])
 
     def get_expenses(self):
         return sum([expense.amount for expense in self.expenses.all()])
@@ -32,7 +32,7 @@ class User(AuthUser):
 
     def get_money_after_expenses(self):
         # monthly
-        return self.get_total_income() - self.get_expenses() - self.get_minimum_payments()
+        return self.get_total_monthly_income() - self.get_expenses() - self.get_minimum_payments()
 
 
 @receiver(post_save, sender=User)#settings.AUTH_USER_MODEL)
@@ -89,6 +89,19 @@ class Income(Common):
 
     def get_absolute_url(self):
         return reverse('income-detail', kwargs={'pk': self.id})
+
+    def get_monthly_income(self):
+        if self.pay_type == PayType.WEEKLY:
+            return self.amount * (52 / 12)
+        if self.pay_type == PayType.BIWEEKLY:
+            return self.amount * (52 / 2 / 12)
+        if self.pay_type == PayType.SEMI_MONTHLY:
+            return self.amount * 2
+        if self.pay_type == PayType.MONTHLY:
+            return self.amount
+        if self.pay_type == PayType.THIRTEEN_PAYS:
+            # TODO: what to do about this
+            return self.amount
 
 
 class Type(Common):
