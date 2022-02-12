@@ -1,3 +1,0 @@
--r common.txt
-coverage==3.7.1
-httpie==1.0.3
