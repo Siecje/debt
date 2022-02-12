@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.10]
+        python-version: ['3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -26,7 +26,6 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install --upgrade pipenv
         pipenv install --dev
-        pipenv shell
     - name: Run Tests
       run: |
-        python manage.py test
+        pipenv run python manage.py test
