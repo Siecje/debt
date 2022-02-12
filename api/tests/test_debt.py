@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from api.models import CreditCard, Income, Overdraft, User
+from api.models import CreditCard, Income, Overdraft, PayType, User
 
 
 class DebtTests(APITestCase):
@@ -107,8 +107,7 @@ class DebtTests(APITestCase):
             name='Job',
             user=self.user,
             amount=200,
-            frequency=30,
-            date=datetime.now()
+            pay_type=PayType.MONTHLY,
         )
         CreditCard.objects.create(
             name='One', interest_rate=20.0, balance=1000,
@@ -124,8 +123,7 @@ class DebtTests(APITestCase):
             name='Job',
             user=self.user,
             amount=200,
-            frequency=30,
-            date=datetime.now()
+            pay_type=PayType.MONTHLY,
         )
         CreditCard.objects.create(
             name='One', interest_rate=20.0, balance=1000,

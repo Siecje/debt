@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 
 
@@ -49,13 +50,33 @@ class Common(models.Model):
         abstract = True
 
 
+class DayOfWeek(models.IntegerChoices):
+    SUNDAY = 0, _("Sunday")
+    MONDAY = 1, _("Monday")
+    TUESDAY = 2, _("Tuesday")
+    WEDNESDAY = 3, _("Wednesday")
+    THURSDAY = 4, _("Thursday")
+    FRIDAY = 5, _("Friday")
+    SATURDAY = 6, _("Saturday")
+
+
+class PayType(models.IntegerChoices):
+    WEEKLY = 0, _("weekly")
+    BIWEEKLY = 1, _("biweekly")
+    SEMI_MONTHLY = 2, _("semi-monthly")
+    MONTHLY = 3, _("monthly")
+    THIRTEEN_PAYS = 4, _("13 pay periods a year")
+
+
 class Income(Common):
     name = models.TextField()
     amount = models.IntegerField()
-    # How often you receive self.amount
-    frequency = models.IntegerField()
-    # One of your pay days
-    date = models.DateField()
+    # The day of the week you are paid
+    # NULL for semi-monthly & monthly
+    # semi-monthly means paid on 15th & last business day of the month
+    # monthly means paid on the last business day of the month
+    pay_day = models.IntegerField(choices=DayOfWeek.choices, null=True, blank=True)
+    pay_type = models.IntegerField(choices=PayType.choices)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
