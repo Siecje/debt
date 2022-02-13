@@ -17,3 +17,18 @@ lines_after_imports = 2
 no_lines_before = "LOCALFOLDER"
 order_by_type = false
 profile = "black"
+
+[tool.coverage.run]
+branch = true
+include = ["api/*" , "debt/*"]
+omit = ["*wsgi.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+]
+
+[tool.coverage.html]
+directory = "tmp/coverage"

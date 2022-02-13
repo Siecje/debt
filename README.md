@@ -73,7 +73,7 @@ $ http --json GET http://localhost:8000/api/v1.0/credit-cards/ \
 ## Tests
 
 ```shell
-coverage run --source='.' manage.py test
+coverage run manage.py test
 coverage html
 firefox tmp/coverage/index.html
 ```
