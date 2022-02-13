@@ -1,25 +1,13 @@
-from datetime import datetime
 import json
 
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 
-from api.models import CreditCard, Income, Overdraft, PayType, User
+from api.models import CreditCard, Income, Overdraft, PayType
+from api.tests.base import APIBaseTest
 
 
-class DebtTests(APITestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='one', 
-            email='one@exmaple.com', 
-            password='one',
-        )
-
-        token = Token.objects.get(user__username=self.user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('get-debts')
+class DebtTests(APIBaseTest):
+    url = reverse('get-debts')
 
     def test_get_debts(self):
         credit_card = CreditCard.objects.create(

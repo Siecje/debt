@@ -10,9 +10,14 @@ from api.serializers import UserSerializer
 
 
 class UserTests(APITestCase):
-    def setUp(self):
+    token_key = None
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
         # Create superuser for tests
-        self.admin = User.objects.create_superuser(
+        cls.admin = User.objects.create_superuser(
             username='Admin',
             email='admin@example.com',
             password='admin',
@@ -20,24 +25,27 @@ class UserTests(APITestCase):
         # Get token
         url = reverse('auth-token')
         data = {
-            'username': self.admin.username,
+            'username': cls.admin.username,
             'password': 'admin'
         }
-        response = self.client.post(url, data, format='json')
+        client = APIClient()
+        response = client.post(url, data, format='json')
+        cls.token_key = response.data['token']
 
-        # Requests made with self.client will be as admin
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
-
-        self.user_one = User.objects.create_user(
+        cls.user_one = User.objects.create_user(
             username='one',
             email='one@exmaple.com',
             password='one',
         )
-        self.user_two = User.objects.create_user(
+        cls.user_two = User.objects.create_user(
             username='two',
             email='two@exmaple.com',
             password='two',
         )
+
+    def setUp(self):
+        # Requests made with self.client will be as admin
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token_key)
 
     def test_create_account(self):
         """

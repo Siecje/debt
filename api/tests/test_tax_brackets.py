@@ -1,22 +1,11 @@
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 
-from api.models import TaxBracket, User
+from api.models import TaxBracket
+from api.tests.base import APIBaseTest
 
 
-class TaxBracketTests(APITestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='one',
-            email='one@exmaple.com',
-            password='one',
-        )
-
-        token = Token.objects.get(user__username=self.user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('taxbracket-list')
+class TaxBracketTests(APIBaseTest):
+    url = reverse('taxbracket-list')
 
     def test_get_investments(self):
         tax_bracket = TaxBracket.objects.create(

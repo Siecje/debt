@@ -1,23 +1,12 @@
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 
-from api.models import Investment, User
+from api.models import Investment
 from api.serializers import InvestmentSerializer
+from api.tests.base import APIBaseTest
 
 
-class InvestmentTests(APITestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='one',
-            email='one@exmaple.com',
-            password='one',
-        )
-
-        token = Token.objects.get(user__username=self.user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('investment-list')
+class InvestmentTests(APIBaseTest):
+    url = reverse('investment-list')
 
     def test_get_investments(self):
         investment = Investment.objects.create(
