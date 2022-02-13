@@ -103,7 +103,7 @@ user_detail = views.UserViewSet.as_view({
 
 # urlpatterns = format_suffix_patterns([
 urlpatterns = [
-    path('', views.api_root),
+    path('', views.api_root, name='api-root'),
     path('credit-cards/',
         creditcard_list,
         name='creditcard-list'),

@@ -62,6 +62,20 @@ class UserTests(APITestCase):
         user = User.objects.get(username='Unique')
         self.assertEqual(response.data, UserSerializer(user).data)
 
+    def test_create_account_invalid(self):
+        """
+        Ensure we can create a new account object.
+        """
+        url = reverse('user-list')
+        data = {
+            'username': 'Unique',
+            'email': 'unique@', # invalid email
+            'password': 'unique'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json(), {'email': ['Enter a valid email address.']})
+
     def test_admin_can_view_all_user_list(self):
         """
         Ensure admins can view all users
