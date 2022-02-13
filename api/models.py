@@ -1,8 +1,8 @@
 import json
 import uuid
 
-from django.contrib.auth.models import User as AuthUser
 from django.conf import settings
+from django.contrib.auth.models import User as AuthUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save

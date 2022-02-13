@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import CreditCard, Expense, Income, Investment, \
-                    Overdraft, TaxBracket, Type
+
+from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBracket, Type
 
 
 class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
