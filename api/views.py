@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -133,15 +134,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def create_user(self, request):
         serialized = CreateUserSerializer(data=request.data)
         if serialized.is_valid():
-            user = User(
+            user = get_user_model().objects.create_user(
+                serialized.data.get('username'),
                 email=serialized.data.get('email'),
-                username=serialized.data.get('username')
+                password=serialized.data.get('password'),
             )
-            user.set_password(serialized.data.get('password'))
-            user.save()
 
-            return Response(UserSerializer(user).data,
-                            status=status.HTTP_201_CREATED)
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):

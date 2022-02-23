@@ -1,12 +1,15 @@
 import json
 
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from api.models import User
 from api.serializers import UserSerializer
+
+
+User = get_user_model()
 
 
 class UserTests(APITestCase):
@@ -61,6 +64,10 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         user = User.objects.get(username='Unique')
         self.assertEqual(response.data, UserSerializer(user).data)
+        self.assertEqual(1, Token.objects.filter(user=user).count())
+        user.first_name = "test_save_user_doesnt_create_new_token"
+        user.save()
+        self.assertEqual(1, Token.objects.filter(user=user).count())
 
     def test_create_account_invalid(self):
         """

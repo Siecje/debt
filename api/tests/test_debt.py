@@ -28,19 +28,21 @@ class DebtTests(APIBaseTest):
         )
 
     def test_credit_cards_sorted_by_interest_rate(self):
+        balance1 = 1_000
         card1 = CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
+            balance=balance1,
             min_payment=10,
             min_payment_percent=10.0,
             annual_fee=100,
             user=self.user,
         )
+        balance2 = 2_000
         card2 = CreditCard.objects.create(
             name='Two',
             interest_rate=20.1,
-            balance=1000,
+            balance=balance2,
             min_payment=10,
             min_payment_percent=10.0,
             annual_fee=100,
@@ -52,6 +54,7 @@ class DebtTests(APIBaseTest):
             response.content,
             [card2.to_JSON(), card1.to_JSON()],
         )
+        self.assertEqual(self.user.get_total_debt(), balance1 + balance2)
 
     def test_debts_sorted_by_fee(self):
         """

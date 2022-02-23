@@ -26,7 +26,7 @@ class User(AuthUser):
     def get_minimum_payments(self):
         return sum([credit_card.min_payment for credit_card in self.credit_cards.all()])
 
-    def get_debt(self):
+    def get_total_debt(self):
         return (sum([credit_card.balance for credit_card in self.credit_cards.all()])
                 + sum([overdraft.balance for overdraft in self.overdrafts.all()]))
 
@@ -35,7 +35,7 @@ class User(AuthUser):
         return self.get_total_monthly_income() - self.get_expenses() - self.get_minimum_payments()
 
 
-@receiver(post_save, sender=User)#settings.AUTH_USER_MODEL)
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
@@ -105,7 +105,6 @@ class Income(Common):
 
 
 class Type(Common):
-    #TODO: Rename to ExpenseType or Tag?
     name = models.TextField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

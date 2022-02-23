@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
@@ -12,11 +13,13 @@ class APIBaseTest(APITestCase):
         super().setUpTestData()
 
         # Data required for any (all) test
-        cls.user = User.objects.create_user(
+        get_user_model().objects.create_user(
             username='one',
             email='one@exmaple.com',
             password='one',
         )
+        # So user has additional methods
+        cls.user = User.objects.get(username='one')
 
         token = Token.objects.get(user__username=cls.user.username)
         cls.token_key = token.key
