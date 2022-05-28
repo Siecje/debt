@@ -1,9 +1,7 @@
-import json
 import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User as AuthUser
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -313,6 +311,7 @@ class TaxBracket(Common):
     def __str__(self):
         return '{0}% {1} - {2}'.format(self.tax_rate, self.lower, self.upper)
 
+    # from django.core.exceptions import ValidationError
     # def clean(self):
     #     if self.upper != 0 and self.upper < self.lower:
     #         raise ValidationError('The upper bound must be larger than the lower bound.')

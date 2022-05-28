@@ -18,7 +18,7 @@ class TaxBracketTests(APIBaseTest):
 
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()[0]['group'], 'Federal')
+        self.assertEqual(response.json()[0]['group'], tax_bracket.group)
 
     def test_create_tax_bracket(self):
         data = {
@@ -30,7 +30,6 @@ class TaxBracketTests(APIBaseTest):
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
-
 
     def test_create_lower_above_upper(self):
         data = {

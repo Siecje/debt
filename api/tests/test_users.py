@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
@@ -76,12 +74,15 @@ class UserTests(APITestCase):
         url = reverse('user-list')
         data = {
             'username': 'Unique',
-            'email': 'unique@', # invalid email
+            'email': 'unique@',  # invalid email
             'password': 'unique'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json(), {'email': ['Enter a valid email address.']})
+        self.assertEqual(
+            response.json(),
+            {'email': ['Enter a valid email address.']}
+        )
 
     def test_admin_can_view_all_user_list(self):
         """

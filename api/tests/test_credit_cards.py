@@ -9,7 +9,7 @@ from api.tests.base import APIBaseTest
 
 class CreditCardTests(APIBaseTest):
     list_url = reverse('creditcard-list')
-    
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -44,7 +44,10 @@ class CreditCardTests(APIBaseTest):
           credit_card_from_response,
           expected
         )
-        self.assertEqual(credit_card_from_response['url'], self.credit_card.get_absolute_url())
+        self.assertEqual(
+            credit_card_from_response['url'],
+            self.credit_card.get_absolute_url()
+        )
 
     def test_timeline_monthly_payment_less_than_min_payment(self):
         timeline = self.credit_card.timeline(self.credit_card.min_payment - 1)

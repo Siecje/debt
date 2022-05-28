@@ -9,7 +9,7 @@ from api.tests.base import APIBaseTest
 
 class OverdraftTests(APIBaseTest):
     list_url = reverse('overdraft-list')
-    
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -40,7 +40,10 @@ class OverdraftTests(APIBaseTest):
           overdraft_from_response,
           expected
         )
-        self.assertEqual(overdraft_from_response['url'], self.overdraft.get_absolute_url())
+        self.assertEqual(
+            overdraft_from_response['url'],
+            self.overdraft.get_absolute_url()
+        )
 
     def test_timeline_monthly_payment_less_than_min_payment(self):
         timeline = self.overdraft.timeline(100)

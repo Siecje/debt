@@ -1,7 +1,6 @@
 import json
 
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
 
 from api.models import Expense, Type
 from api.tests.base import APIBaseTest
@@ -12,7 +11,7 @@ from api.tests.base import APIBaseTest
 
 class ExpensesTests(APIBaseTest):
     list_url = reverse('expense-list')
-    
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -73,11 +72,14 @@ class ExpensesTests(APIBaseTest):
         response = self.client.get(url)
         type_from_response = json.loads(response.content)['type']
         self.assertEqual(type_from_response['name'], self.type1.name)
-        self.assertEqual(type_from_response['url'], self.type1.get_absolute_url())
+        self.assertEqual(
+            type_from_response['url'],
+            self.type1.get_absolute_url()
+        )
         self.assertEqual(type_from_response['id'], str(self.type1.id))
 
     def test_get_expense_list_has_type_names(self):
-        expense = Expense.objects.create(
+        Expense.objects.create(
             name='Expense',
             amount=100,
             frequency=1,
@@ -85,4 +87,7 @@ class ExpensesTests(APIBaseTest):
             user=self.user,
         )
         response = self.client.get(self.list_url)
-        self.assertEqual(json.loads(response.content)[0]['type']['name'], 'First')
+        self.assertEqual(
+            json.loads(response.content)[0]['type']['name'],
+            'First'
+        )

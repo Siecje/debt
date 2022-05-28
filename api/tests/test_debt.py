@@ -170,12 +170,12 @@ class DebtTests(APIBaseTest):
             name='One',
             interest_rate=20.0,
             balance=1000_00,
-            min_payment=10, 
+            min_payment=10,
             min_payment_percent=10.0,
             annual_fee=100_00,
             user=self.user,
         )
-        overdraft = Overdraft.objects.create(
+        Overdraft.objects.create(
             name='Over',
             interest_rate=20.0,
             balance=1000_00,
@@ -198,12 +198,12 @@ class DebtTests(APIBaseTest):
             name='One',
             interest_rate=20.0,
             balance=1000_00,
-            min_payment=10, 
+            min_payment=10,
             min_payment_percent=10.0,
             annual_fee=100_00,
             user=self.user,
         )
-        overdraft = Overdraft.objects.create(
+        Overdraft.objects.create(
             name='Over',
             interest_rate=20.0,
             balance=1000_00,

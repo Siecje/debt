@@ -8,7 +8,6 @@ from .models import (
     Income,
     Investment,
     Overdraft,
-    PayType,
     TaxBracket,
     Type,
 )
@@ -39,7 +38,7 @@ class RelatedTypeSerializer(serializers.HyperlinkedModelSerializer):
         model = Type
         fields = ('id', 'url', 'name')
         lookup_field = 'pk'
-    
+
     def get_url(self, obj):
         return obj.get_absolute_url()
 
@@ -69,36 +68,15 @@ class IncomeSerializer(serializers.ModelSerializer):
         )
 
     def get_pay_day(self, obj):
-        # TODO: Use translation in DayOfWeek definition?
-        day_as_string = {
-            DayOfWeek.SUNDAY: 'Sunday',
-            DayOfWeek.MONDAY: 'Monday',
-            DayOfWeek.TUESDAY: 'Tuesday',
-            DayOfWeek.WEDNESDAY: 'Wednesday',
-            DayOfWeek.THURSDAY: 'Thursday',
-            DayOfWeek.FRIDAY: 'Friday',
-            DayOfWeek.SATURDAY: 'Saturday',
-            None: None,
-        }
-        return day_as_string[obj.pay_day]
-        
+        if not obj.pay_day:
+            return obj.pay_day
+        return DayOfWeek.labels[obj.pay_day]
+
     def get_monthly_amount(self, obj):
         return obj.get_monthly_amount()
 
     def get_url(self, obj):
         return obj.get_absolute_url()
-
-    # def get_pay_type(self, obj):
-    #     pay_type_as_string = {
-    #         PayType.WEEKLY: 'Weekly',
-    #         PayType.BIWEEKLY: 'Bi-weekly',
-    #         PayType.MONTHLY: 'Monthly',
-    #         PayType.SEMI_MONTHLY: 'Semi Monthly',
-    #         PayType.THIRTEEN_PAYS: 'Thirteen Pays',
-    #     }
-    #     return pay_type_as_string[obj.pay_type]
-
-
 
 
 class TypeSerializer(serializers.ModelSerializer):
@@ -187,6 +165,7 @@ class TaxBracketSerializer(serializers.ModelSerializer):
         if data['upper'] != 0 and data['lower'] > data['upper']:
             raise serializers.ValidationError('The upper bound must be larger than the lower bound.')
         return data
+
 
 class UserSerializer(serializers.ModelSerializer):
 

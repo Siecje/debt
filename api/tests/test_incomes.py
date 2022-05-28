@@ -9,7 +9,7 @@ from api.tests.base import APIBaseTest
 
 class IncomeTests(APIBaseTest):
     list_url = reverse('income-list')
-    
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
