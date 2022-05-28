@@ -65,7 +65,7 @@ class UserTests(APITestCase):
         user = User.objects.get(username='Unique')
         self.assertEqual(response.data, UserSerializer(user).data)
         self.assertEqual(1, Token.objects.filter(user=user).count())
-        user.first_name = "test_save_user_doesnt_create_new_token"
+        user.first_name = 'test_save_user_doesnt_create_new_token'
         user.save()
         self.assertEqual(1, Token.objects.filter(user=user).count())
 

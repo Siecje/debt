@@ -183,6 +183,8 @@ def get_debt_timeline(request):
 
     for index, debt in enumerate(debts):
         result = debt.timeline(payment)
+        if result['num_months'] == -1:
+            return Response({'num_months': -1})
         # The current debt has been eliminated
         num_months += result['num_months']
         # Total debt each month for current debt

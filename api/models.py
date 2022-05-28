@@ -51,21 +51,21 @@ class Common(models.Model):
 
 
 class DayOfWeek(models.IntegerChoices):
-    SUNDAY = 0, _("Sunday")
-    MONDAY = 1, _("Monday")
-    TUESDAY = 2, _("Tuesday")
-    WEDNESDAY = 3, _("Wednesday")
-    THURSDAY = 4, _("Thursday")
-    FRIDAY = 5, _("Friday")
-    SATURDAY = 6, _("Saturday")
+    SUNDAY = 0, _('Sunday')
+    MONDAY = 1, _('Monday')
+    TUESDAY = 2, _('Tuesday')
+    WEDNESDAY = 3, _('Wednesday')
+    THURSDAY = 4, _('Thursday')
+    FRIDAY = 5, _('Friday')
+    SATURDAY = 6, _('Saturday')
 
 
 class PayType(models.IntegerChoices):
-    WEEKLY = 0, _("weekly")
-    BIWEEKLY = 1, _("biweekly")
-    SEMI_MONTHLY = 2, _("semi-monthly")
-    MONTHLY = 3, _("monthly")
-    THIRTEEN_PAYS = 4, _("13 pay periods a year")
+    WEEKLY = 0, _('weekly')
+    BIWEEKLY = 1, _('biweekly')
+    SEMI_MONTHLY = 2, _('semi-monthly')
+    MONTHLY = 3, _('monthly')
+    THIRTEEN_PAYS = 4, _('13 pay periods a year')
 
 
 class Income(Common):
@@ -156,7 +156,7 @@ class CreditCard(Common):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('credit-card-detail', kwargs={'pk': self.id})
+        return reverse('creditcard-detail', kwargs={'pk': self.id})
 
     def to_JSON(self):
         return {
@@ -182,6 +182,8 @@ class CreditCard(Common):
         total_paid = 0
         total_interest = 0
 
+        previous_amount = amount
+
         while amount > 0:
             interest = amount * (self.interest_rate / 100 / 12)
             total_interest += interest
@@ -199,6 +201,8 @@ class CreditCard(Common):
             total_paid += payment
             amount -= payment
             points.append(amount)
+            if amount >= previous_amount:
+                return {'num_months': -1}
 
         return {
             'debt_per_month': points,
@@ -263,8 +267,8 @@ class Overdraft(Common):
             total_paid += payment
             amount -= payment
             points.append(amount)
-            if amount > previous_amount:
-                break
+            if amount >= previous_amount:
+                return {'num_months': -1}
 
         return {
             'debt_per_month': points,
@@ -309,6 +313,6 @@ class TaxBracket(Common):
     def __str__(self):
         return '{0}% {1} - {2}'.format(self.tax_rate, self.lower, self.upper)
 
-    def clean(self):
-        if self.upper != 0 and self.upper < self.lower:
-            raise ValidationError('The upper bound must be larger than the lower bound.')
+    # def clean(self):
+    #     if self.upper != 0 and self.upper < self.lower:
+    #         raise ValidationError('The upper bound must be larger than the lower bound.')

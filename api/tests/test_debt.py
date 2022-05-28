@@ -163,26 +163,54 @@ class DebtTests(APIBaseTest):
         Income.objects.create(
             name='Job',
             user=self.user,
-            pay_amount=100,
+            pay_amount=500_00,
             pay_type=PayType.SEMI_MONTHLY,
         )
         CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
+            balance=1000_00,
             min_payment=10, 
             min_payment_percent=10.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
         overdraft = Overdraft.objects.create(
             name='Over',
             interest_rate=20.0,
-            balance=1000,
-            monthly_fee=9,
+            balance=1000_00,
+            monthly_fee=9_00,
             user=self.user,
         )
         url = reverse('get-timeline')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)['num_months'], 8)
+        self.assertEqual(json.loads(response.content)['num_months'], 4)
+
+    def test_timeline_cannot_reduce_debt(self):
+        Income.objects.create(
+            name='Job',
+            user=self.user,
+            pay_amount=100_00,
+            pay_type=PayType.SEMI_MONTHLY,
+        )
+        CreditCard.objects.create(
+            name='One',
+            interest_rate=20.0,
+            balance=1000_00,
+            min_payment=10, 
+            min_payment_percent=10.0,
+            annual_fee=100_00,
+            user=self.user,
+        )
+        overdraft = Overdraft.objects.create(
+            name='Over',
+            interest_rate=20.0,
+            balance=1000_00,
+            monthly_fee=9_00,
+            user=self.user,
+        )
+        url = reverse('get-timeline')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['num_months'], -1)

@@ -71,7 +71,10 @@ class ExpensesTests(APIBaseTest):
             user=self.user)
         url = reverse('expense-detail', kwargs={'pk': expense.id})
         response = self.client.get(url)
-        self.assertEqual(json.loads(response.content)['type']['name'], 'First')
+        type_from_response = json.loads(response.content)['type']
+        self.assertEqual(type_from_response['name'], self.type1.name)
+        self.assertEqual(type_from_response['url'], self.type1.get_absolute_url())
+        self.assertEqual(type_from_response['id'], str(self.type1.id))
 
     def test_get_expense_list_has_type_names(self):
         expense = Expense.objects.create(

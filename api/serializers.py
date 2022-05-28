@@ -33,10 +33,15 @@ class RelatedExpenseSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RelatedTypeSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.SerializerMethodField()
+
     class Meta:
         model = Type
         fields = ('id', 'url', 'name')
         lookup_field = 'pk'
+    
+    def get_url(self, obj):
+        return obj.get_absolute_url()
 
 
 class IncomeSerializer(serializers.ModelSerializer):
@@ -135,22 +140,29 @@ class CreditCardSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = CreditCard
         fields = ('id', 'name', 'interest_rate', 'balance', 'min_payment',
-                  'min_payment_percent', 'annual_fee', 'user')
+                  'min_payment_percent', 'annual_fee', 'url', 'user')
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
 
 
 class OverdraftSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Overdraft
-        fields = ('id', 'name', 'balance', 'monthly_fee', 'interest_rate', 'user')
+        fields = ('id', 'name', 'balance', 'monthly_fee', 'interest_rate', 'url', 'user')
 
+    def get_url(self, obj):
+        return obj.get_absolute_url()
 
 class InvestmentSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
@@ -171,6 +183,10 @@ class TaxBracketSerializer(serializers.ModelSerializer):
         model = TaxBracket
         fields = ('id', 'lower', 'upper', 'tax_rate', 'group', 'user')
 
+    def validate(self, data):
+        if data['upper'] != 0 and data['lower'] > data['upper']:
+            raise serializers.ValidationError('The upper bound must be larger than the lower bound.')
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
 
