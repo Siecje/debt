@@ -18,7 +18,7 @@ class User(AuthUser):
         proxy = True
 
     def get_total_monthly_income(self):
-        return sum([income.get_monthly_income() for income in self.incomes.all()])
+        return sum([income.get_monthly_amount() for income in self.incomes.all()])
 
     def get_expenses(self):
         return sum([expense.amount for expense in self.expenses.all()])
@@ -70,7 +70,7 @@ class PayType(models.IntegerChoices):
 
 class Income(Common):
     name = models.TextField()
-    amount = models.IntegerField()
+    pay_amount = models.IntegerField()
     # The day of the week you are paid
     # NULL for semi-monthly & monthly
     # semi-monthly means paid on 15th & last business day of the month
@@ -90,18 +90,18 @@ class Income(Common):
     def get_absolute_url(self):
         return reverse('income-detail', kwargs={'pk': self.id})
 
-    def get_monthly_income(self):
+    def get_monthly_amount(self):
         if self.pay_type == PayType.WEEKLY:
-            return self.amount * (52 / 12)
+            return self.pay_amount * (52 / 12)
         if self.pay_type == PayType.BIWEEKLY:
-            return self.amount * (52 / 2 / 12)
+            return self.pay_amount * (52 / 2 / 12)
         if self.pay_type == PayType.SEMI_MONTHLY:
-            return self.amount * 2
+            return self.pay_amount * 2
         if self.pay_type == PayType.MONTHLY:
-            return self.amount
-        if self.pay_type == PayType.THIRTEEN_PAYS:
-            # TODO: what to do about this
-            return self.amount
+            return self.pay_amount
+        # self.pay_type == PayType.THIRTEEN_PAYS:
+        # TODO: what to do about THIRTEEN_PAYS?
+        return self.pay_amount
 
 
 class Type(Common):

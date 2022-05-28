@@ -1,7 +1,17 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import CreditCard, Expense, Income, Investment, Overdraft, TaxBracket, Type
+from .models import (
+    CreditCard,
+    DayOfWeek,
+    Expense,
+    Income,
+    Investment,
+    Overdraft,
+    PayType,
+    TaxBracket,
+    Type,
+)
 
 
 class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,10 +43,57 @@ class IncomeSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
+    pay_day = serializers.SerializerMethodField()
+    # pay_type = serializers.SerializerMethodField()
+    monthly_amount = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = Income
-        fields = ('id', 'name', 'amount', 'frequency', 'date', 'user', 'created', 'updated')
+        fields = (
+            'id',
+            'monthly_amount',
+            'name',
+            'pay_amount',
+            'pay_day',
+            'pay_type',
+            'url',
+            'user',
+            'created',
+            'updated',
+        )
+
+    def get_pay_day(self, obj):
+        # TODO: Use translation in DayOfWeek definition?
+        day_as_string = {
+            DayOfWeek.SUNDAY: 'Sunday',
+            DayOfWeek.MONDAY: 'Monday',
+            DayOfWeek.TUESDAY: 'Tuesday',
+            DayOfWeek.WEDNESDAY: 'Wednesday',
+            DayOfWeek.THURSDAY: 'Thursday',
+            DayOfWeek.FRIDAY: 'Friday',
+            DayOfWeek.SATURDAY: 'Saturday',
+            None: None,
+        }
+        return day_as_string[obj.pay_day]
+        
+    def get_monthly_amount(self, obj):
+        return obj.get_monthly_amount()
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
+
+    # def get_pay_type(self, obj):
+    #     pay_type_as_string = {
+    #         PayType.WEEKLY: 'Weekly',
+    #         PayType.BIWEEKLY: 'Bi-weekly',
+    #         PayType.MONTHLY: 'Monthly',
+    #         PayType.SEMI_MONTHLY: 'Semi Monthly',
+    #         PayType.THIRTEEN_PAYS: 'Thirteen Pays',
+    #     }
+    #     return pay_type_as_string[obj.pay_type]
+
+
 
 
 class TypeSerializer(serializers.ModelSerializer):
