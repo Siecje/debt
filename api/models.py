@@ -43,8 +43,8 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class Common(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True

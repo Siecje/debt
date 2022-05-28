@@ -59,8 +59,8 @@ class IncomeSerializer(serializers.ModelSerializer):
             'pay_type',
             'url',
             'user',
-            'created',
-            'updated',
+            'date_created',
+            'date_updated',
         )
 
     def get_pay_day(self, obj):
@@ -107,7 +107,7 @@ class TypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Type
-        fields = ('id', 'name', 'user', 'expenses', 'created', 'updated')
+        fields = ('id', 'name', 'user', 'expenses', 'date_created', 'date_updated')
 
 
 class DisplayExpenseSerializer(serializers.ModelSerializer):
@@ -118,7 +118,7 @@ class DisplayExpenseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Expense
-        fields = ('id', 'name', 'amount', 'frequency', 'type', 'user', 'created', 'updated')
+        fields = ('id', 'name', 'amount', 'frequency', 'type', 'user', 'date_created', 'date_updated')
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
@@ -128,7 +128,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Expense
-        fields = ('id', 'name', 'amount', 'frequency', 'type', 'user', 'created', 'updated')
+        fields = ('id', 'name', 'amount', 'frequency', 'type', 'user', 'date_created', 'date_updated')
 
 
 class CreditCardSerializer(serializers.ModelSerializer):
