@@ -25,9 +25,9 @@ class IncomeTests(APIBaseTest):
         data = {
             'name': 'Weekly',
             'pay_amount': '100',
-            'pay_day': DayOfWeek.WEDNESDAY,
-            'pay_type': PayType.WEEKLY,
-            'user': self.user.id
+            'pay_day': DayOfWeek.labels[DayOfWeek.WEDNESDAY],
+            'pay_type': PayType.labels[PayType.WEEKLY],
+            'user': self.user.id,
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -36,9 +36,9 @@ class IncomeTests(APIBaseTest):
         data = {
             'name': 'Biweekly',
             'pay_amount': '100',
-            'pay_day': DayOfWeek.WEDNESDAY,
-            'pay_type': PayType.BIWEEKLY,
-            'user': self.user.id
+            'pay_day': DayOfWeek.labels[DayOfWeek.WEDNESDAY],
+            'pay_type': PayType.labels[PayType.BIWEEKLY],
+            'user': self.user.id,
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -47,8 +47,8 @@ class IncomeTests(APIBaseTest):
         data = {
             'name': 'Income',
             'pay_amount': '100',
-            'pay_type': PayType.SEMI_MONTHLY,
-            'user': self.user.id
+            'pay_type': PayType.labels[PayType.SEMI_MONTHLY],
+            'user': self.user.id,
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -57,8 +57,8 @@ class IncomeTests(APIBaseTest):
         data = {
             'name': 'Income',
             'pay_amount': '100',
-            'pay_type': PayType.MONTHLY,
-            'user': self.user.id
+            'pay_type': PayType.labels[PayType.MONTHLY],
+            'user': self.user.id,
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -67,9 +67,9 @@ class IncomeTests(APIBaseTest):
         data = {
             'name': 'Income',
             'pay_amount': '100',
-            'pay_day': DayOfWeek.WEDNESDAY,
-            'pay_type': PayType.THIRTEEN_PAYS,
-            'user': self.user.id
+            'pay_day': DayOfWeek.labels[DayOfWeek.WEDNESDAY],
+            'pay_type': PayType.labels[PayType.THIRTEEN_PAYS],
+            'user': self.user.id,
         }
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)

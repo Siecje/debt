@@ -8,6 +8,7 @@ from .models import (
     Income,
     Investment,
     Overdraft,
+    PayType,
     TaxBracket,
     Type,
 )
@@ -43,12 +44,38 @@ class RelatedTypeSerializer(serializers.HyperlinkedModelSerializer):
         return obj.get_absolute_url()
 
 
+class PayDayField(serializers.ChoiceField):
+    def to_representation(self, value):
+        if not value:
+            return value
+        return DayOfWeek.labels[value]
+
+    def to_internal_value(self, value):
+        if not value:
+            return value
+        inverted = {v: k for k, v in self.choices.items()}
+        return inverted[value]
+
+
+class PayTypeField(serializers.ChoiceField):
+    def to_representation(self, value):
+        if not value:
+            return value
+        return PayType.labels[value]
+
+    def to_internal_value(self, value):
+        if not value:
+            return value
+        inverted = {v: k for k, v in self.choices.items()}
+        return inverted[value]
+
+
 class IncomeSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
-    pay_day = serializers.SerializerMethodField()
-    # pay_type = serializers.SerializerMethodField()
+    pay_day = PayDayField(choices=DayOfWeek.choices, required=False)
+    pay_type = PayTypeField(choices=PayType.choices)
     monthly_amount = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
@@ -66,11 +93,6 @@ class IncomeSerializer(serializers.ModelSerializer):
             'date_created',
             'date_updated',
         )
-
-    def get_pay_day(self, obj):
-        if not obj.pay_day:
-            return obj.pay_day
-        return DayOfWeek.labels[obj.pay_day]
 
     def get_monthly_amount(self, obj):
         return obj.get_monthly_amount()

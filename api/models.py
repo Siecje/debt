@@ -49,21 +49,21 @@ class Common(models.Model):
 
 
 class DayOfWeek(models.IntegerChoices):
-    SUNDAY = 0, _('Sunday')
-    MONDAY = 1, _('Monday')
-    TUESDAY = 2, _('Tuesday')
-    WEDNESDAY = 3, _('Wednesday')
-    THURSDAY = 4, _('Thursday')
-    FRIDAY = 5, _('Friday')
-    SATURDAY = 6, _('Saturday')
+    SUNDAY = 0, 'Sunday'
+    MONDAY = 1, 'Monday'
+    TUESDAY = 2, 'Tuesday'
+    WEDNESDAY = 3, 'Wednesday'
+    THURSDAY = 4, 'Thursday'
+    FRIDAY = 5, 'Friday'
+    SATURDAY = 6, 'Saturday'
 
 
 class PayType(models.IntegerChoices):
-    WEEKLY = 0, _('weekly')
-    BIWEEKLY = 1, _('biweekly')
-    SEMI_MONTHLY = 2, _('semi-monthly')
-    MONTHLY = 3, _('monthly')
-    THIRTEEN_PAYS = 4, _('13 pay periods a year')
+    WEEKLY = 0, 'weekly'
+    BIWEEKLY = 1, 'biweekly'
+    SEMI_MONTHLY = 2, 'semi-monthly'
+    MONTHLY = 3, 'monthly'
+    THIRTEEN_PAYS = 4, '13-pays-a-year'
 
 
 class Income(Common):
