@@ -9,3 +9,8 @@ def sort_debts(debts):
                 debts[index-1] = debts[index]
                 debts[index] = temp
     return debts
+
+
+def serialize_money(money_int):
+    money_str = str(money_int)
+    return money_str[:-2] + '.' + money_str[-2:]

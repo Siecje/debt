@@ -21,7 +21,7 @@ class ExpensesTests(APIBaseTest):
     def test_create_expense_with_type(self):
         data = {
             'name': 'Expense',
-            'amount': '100',
+            'amount': '100.00',
             'frequency': '1',
             'type': self.type1.id,
             'user': self.user.id
@@ -32,14 +32,14 @@ class ExpensesTests(APIBaseTest):
     def test_edit_expense_with_type(self):
         expense = Expense.objects.create(
             name='Expense',
-            amount=100,
+            amount=100_00,
             frequency=1,
             type=self.type1,
             user=self.user)
         url = reverse('expense-detail', kwargs={'pk': expense.id})
         data = {
             'name': 'Different',
-            'amount': '100',
+            'amount': '100.00',
             'frequency': '1',
             'type': self.type1.id,
             'user': self.user.id
@@ -50,7 +50,7 @@ class ExpensesTests(APIBaseTest):
     def test_change_expense_type(self):
         expense = Expense.objects.create(
             name='Expense',
-            amount=100,
+            amount=100_00,
             frequency=1,
             type=self.type1,
             user=self.user)
@@ -64,7 +64,7 @@ class ExpensesTests(APIBaseTest):
     def test_get_expense_has_type_name(self):
         expense = Expense.objects.create(
             name='Expense',
-            amount=100,
+            amount=100_00,
             frequency=1,
             type=self.type1,
             user=self.user)
@@ -81,7 +81,7 @@ class ExpensesTests(APIBaseTest):
     def test_get_expense_list_has_type_names(self):
         Expense.objects.create(
             name='Expense',
-            amount=100,
+            amount=100_00,
             frequency=1,
             type=self.type1,
             user=self.user,

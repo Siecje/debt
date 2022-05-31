@@ -1,3 +1,5 @@
+import decimal
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -12,6 +14,7 @@ from .models import (
     TaxBracket,
     Type,
 )
+from .utils import serialize_money
 
 
 class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,7 +24,31 @@ class RelatedUserSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = 'pk'
 
 
+class MoneyField(serializers.Field):
+    def to_representation(self, value):
+        """
+        Convert number of cents as an integer
+        to string with decimal point
+        """
+        if not value:
+            return value
+        return serialize_money(value)
+        
+    def to_internal_value(self, value):
+        """
+        Convert string with decimal point
+        to number of cents as an integer
+        """
+        if '.' not in value:
+            raise serializers.ValidationError('Must contain "." and decimal portion.')
+        try:
+            return int(decimal.Decimal(value) * 100)
+        except decimal.InvalidOperation:
+            raise serializers.ValidationError('Invalid number.')
+
+
 class RelatedExpenseSerializer(serializers.HyperlinkedModelSerializer):
+    amount = MoneyField()
     user = RelatedUserSerializer(
         read_only=True
     )
@@ -46,13 +73,9 @@ class RelatedTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 class PayDayField(serializers.ChoiceField):
     def to_representation(self, value):
-        if not value:
-            return value
         return DayOfWeek.labels[value]
 
     def to_internal_value(self, value):
-        if not value:
-            return value
         inverted = {v: k for k, v in self.choices.items()}
         return inverted[value]
 
@@ -64,8 +87,6 @@ class PayTypeField(serializers.ChoiceField):
         return PayType.labels[value]
 
     def to_internal_value(self, value):
-        if not value:
-            return value
         inverted = {v: k for k, v in self.choices.items()}
         return inverted[value]
 
@@ -74,7 +95,8 @@ class IncomeSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
-    pay_day = PayDayField(choices=DayOfWeek.choices, required=False)
+    pay_amount = MoneyField()
+    pay_day = PayDayField(choices=DayOfWeek.choices, required=False, allow_null=True)
     pay_type = PayTypeField(choices=PayType.choices)
     monthly_amount = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
@@ -127,6 +149,7 @@ class DisplayExpenseSerializer(serializers.ModelSerializer):
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    amount = MoneyField()
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
@@ -137,6 +160,9 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
 
 class CreditCardSerializer(serializers.ModelSerializer):
+    annual_fee = MoneyField()
+    balance = MoneyField()
+    min_payment = MoneyField()
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
@@ -152,6 +178,8 @@ class CreditCardSerializer(serializers.ModelSerializer):
 
 
 class OverdraftSerializer(serializers.ModelSerializer):
+    balance = MoneyField()
+    monthly_fee = MoneyField()
     url = serializers.SerializerMethodField()
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
@@ -165,6 +193,7 @@ class OverdraftSerializer(serializers.ModelSerializer):
         return obj.get_absolute_url()
 
 class InvestmentSerializer(serializers.ModelSerializer):
+    balance = MoneyField()
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )

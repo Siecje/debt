@@ -159,7 +159,7 @@ def get_debts(request):
     other debt sooner.
     """
     overdrafts = Overdraft.objects.filter(user=request.user).order_by('monthly_fee').all()
-    credit_cards = CreditCard.objects.order_by('interest_rate', 'annual_fee').all()
+    credit_cards = CreditCard.objects.order_by('-interest_rate', '-annual_fee').all()
     result = sort_debts(list(overdrafts) + list(credit_cards))
 
     serialized = []

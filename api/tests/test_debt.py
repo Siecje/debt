@@ -3,7 +3,9 @@ import json
 from django.urls import reverse
 
 from api.models import CreditCard, Income, Overdraft, PayType
-from api.tests.base import APIBaseTest
+from api.utils import serialize_money
+
+from .base import APIBaseTest
 
 
 class DebtTests(APIBaseTest):
@@ -13,10 +15,10 @@ class DebtTests(APIBaseTest):
         credit_card = CreditCard.objects.create(
             name='First',
             interest_rate=20.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=15.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
 
@@ -28,24 +30,27 @@ class DebtTests(APIBaseTest):
         )
 
     def test_credit_cards_sorted_by_interest_rate(self):
-        balance1 = 1_000
+        # The same for both
+        balance = 1000_00
+        min_payment = 10_00
+        min_payment_percent = 10.0
+        annual_fee = 100_00
         card1 = CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=balance1,
-            min_payment=10,
-            min_payment_percent=10.0,
-            annual_fee=100,
+            balance=balance,
+            min_payment=min_payment,
+            min_payment_percent=min_payment_percent,
+            annual_fee=annual_fee,
             user=self.user,
         )
-        balance2 = 2_000
         card2 = CreditCard.objects.create(
             name='Two',
             interest_rate=20.1,
-            balance=balance2,
-            min_payment=10,
-            min_payment_percent=10.0,
-            annual_fee=100,
+            balance=balance,
+            min_payment=min_payment,
+            min_payment_percent=min_payment_percent,
+            annual_fee=annual_fee,
             user=self.user,
         )
         response = self.client.get(self.url)
@@ -54,7 +59,7 @@ class DebtTests(APIBaseTest):
             response.content,
             [card2.to_JSON(), card1.to_JSON()],
         )
-        self.assertEqual(self.user.get_total_debt(), balance1 + balance2)
+        self.assertEqual(self.user.get_total_debt(), serialize_money(balance + balance))
 
     def test_debts_sorted_by_fee(self):
         """
@@ -63,17 +68,17 @@ class DebtTests(APIBaseTest):
         card = CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=10.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
         overdraft = Overdraft.objects.create(
             name='Over',
             interest_rate=20.0,
-            balance=1000,
-            monthly_fee=9,
+            balance=1000_00,
+            monthly_fee=9_00,
             user=self.user,
         )
         response = self.client.get(self.url)
@@ -92,19 +97,19 @@ class DebtTests(APIBaseTest):
         card1 = CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=10.0,
-            annual_fee=111,
+            annual_fee=111_00,
             user=self.user,
         )
         card2 = CreditCard.objects.create(
             name='Two',
             interest_rate=21.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=10.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
         response = self.client.get(self.url)
@@ -118,17 +123,17 @@ class DebtTests(APIBaseTest):
         card = CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=10.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
         overdraft = Overdraft.objects.create(
             name='Over',
             interest_rate=21.0,
-            balance=1000,
-            monthly_fee=5,
+            balance=1000_00,
+            monthly_fee=5_00,
             user=self.user,
         )
         response = self.client.get(self.url)
@@ -142,16 +147,16 @@ class DebtTests(APIBaseTest):
         Income.objects.create(
             name='Job',
             user=self.user,
-            pay_amount=200,
+            pay_amount=200_00,
             pay_type=PayType.MONTHLY,
         )
         CreditCard.objects.create(
             name='One',
             interest_rate=20.0,
-            balance=1000,
-            min_payment=10,
+            balance=1000_00,
+            min_payment=10_00,
             min_payment_percent=10.0,
-            annual_fee=100,
+            annual_fee=100_00,
             user=self.user,
         )
         url = reverse('get-timeline')
@@ -170,7 +175,7 @@ class DebtTests(APIBaseTest):
             name='One',
             interest_rate=20.0,
             balance=1000_00,
-            min_payment=10,
+            min_payment=10_00,
             min_payment_percent=10.0,
             annual_fee=100_00,
             user=self.user,
@@ -198,7 +203,7 @@ class DebtTests(APIBaseTest):
             name='One',
             interest_rate=20.0,
             balance=1000_00,
-            min_payment=10,
+            min_payment=10_00,
             min_payment_percent=10.0,
             annual_fee=100_00,
             user=self.user,

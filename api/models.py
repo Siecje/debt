@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 
+from api.utils import serialize_money
+
 
 class User(AuthUser):
 
@@ -25,8 +27,9 @@ class User(AuthUser):
         return sum([credit_card.min_payment for credit_card in self.credit_cards.all()])
 
     def get_total_debt(self):
-        return (sum([credit_card.balance for credit_card in self.credit_cards.all()])
+        total = (sum([credit_card.balance for credit_card in self.credit_cards.all()])
                 + sum([overdraft.balance for overdraft in self.overdrafts.all()]))
+        return serialize_money(total)
 
     def get_money_after_expenses(self):
         # monthly
@@ -68,13 +71,14 @@ class PayType(models.IntegerChoices):
 
 class Income(Common):
     name = models.TextField()
+    # pay_amount is the number of cents
     pay_amount = models.IntegerField()
     # The day of the week you are paid
     # NULL for semi-monthly & monthly
     # semi-monthly means paid on 15th & last business day of the month
     # monthly means paid on the last business day of the month
     pay_day = models.IntegerField(choices=DayOfWeek.choices, null=True, blank=True)
-    pay_type = models.IntegerField(choices=PayType.choices)
+    pay_type = models.IntegerField(choices=PayType.choices, null=False, blank=False)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -97,7 +101,7 @@ class Income(Common):
             return self.pay_amount * 2
         if self.pay_type == PayType.MONTHLY:
             return self.pay_amount
-        # self.pay_type == PayType.THIRTEEN_PAYS:
+        # if self.pay_type == PayType.THIRTEEN_PAYS:
         # TODO: what to do about THIRTEEN_PAYS?
         return self.pay_amount
 
@@ -157,16 +161,8 @@ class CreditCard(Common):
         return reverse('creditcard-detail', kwargs={'pk': self.id})
 
     def to_JSON(self):
-        return {
-            'id': str(self.id),
-            'name': self.name,
-            'interest_rate': self.interest_rate,
-            'balance': self.balance,
-            'min_payment': self.min_payment,
-            'min_payment_percent': self.min_payment_percent,
-            'annual_fee': self.annual_fee,
-            'type': 'credit-card'
-        }
+        from api.serializers import CreditCardSerializer
+        return CreditCardSerializer(self).data
 
     def cost(self):
         """ Amount that it is costing each month """
@@ -206,7 +202,7 @@ class CreditCard(Common):
             'debt_per_month': points,
             'num_months': len(points),
             'total_interest_paid': total_interest,
-            'total_paid': total_paid
+            'total_paid': serialize_money(total_paid),
         }
 
 
@@ -233,8 +229,8 @@ class Overdraft(Common):
             'id': str(self.id),
             'name': self.name,
             'interest_rate': self.interest_rate,
-            'balance': self.balance,
-            'monthly_fee': self.monthly_fee,
+            'balance': serialize_money(self.balance),
+            'monthly_fee': serialize_money(self.monthly_fee),
             'type': 'overdraft'
         }
 
@@ -272,7 +268,7 @@ class Overdraft(Common):
             'debt_per_month': points,
             'num_months': len(points),
             'total_interest_paid': total_interest,
-            'total_paid': total_paid
+            'total_paid': serialize_money(total_paid),
         }
 
 

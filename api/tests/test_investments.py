@@ -13,7 +13,7 @@ class InvestmentTests(APIBaseTest):
             name='First',
             interest_rate=8.0,
             min_duration=0,
-            balance=1000,
+            balance=1000_00,
             user=self.user,
         )
 
