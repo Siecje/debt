@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from api.models import CreditCard, Income, Overdraft, PayType
 from api.utils import serialize_money
-
 from .base import APIBaseTest
 
 
